@@ -15,12 +15,12 @@ interface NavUser {
 }
 
 const LINKS = [
-  { href: "/jobs", code: "01", label: "Mandates" },
-  { href: "/tracker", code: "02", label: "My Ledger" },
-  { href: "/calendar", code: "03", label: "Cycles" },
-  { href: "/orgs", code: "04", label: "Institutions" },
-  { href: "/resources", code: "05", label: "Field Manual" },
-  { href: "/alumni", code: "06", label: "Directory" },
+  { href: "/jobs", code: "01", label: "Mandates", shortLabel: "Mandates" },
+  { href: "/tracker", code: "02", label: "My Ledger", shortLabel: "Ledger" },
+  { href: "/calendar", code: "03", label: "Cycles", shortLabel: "Cycles" },
+  { href: "/orgs", code: "04", label: "Institutions", shortLabel: "Institutions" },
+  { href: "/resources", code: "05", label: "Field Manual", shortLabel: "Manual" },
+  { href: "/alumni", code: "06", label: "Directory", shortLabel: "Directory" },
 ];
 
 export function AppNav({
@@ -52,30 +52,30 @@ export function AppNav({
         {/* Top editorial masthead bar */}
         <div className="border-b border-stone-300 bg-[#EFECE4] px-4 py-1 text-[11px] text-stone-600 sm:px-6">
           <div className="mx-auto flex max-w-6xl items-center justify-between font-mono-tabular">
-            <span>
+            <span className="truncate whitespace-nowrap">
               IIT DELHI · MASTER OF PUBLIC POLICY (MPP) COHORT REPOSITORY
             </span>
-            <span className="hidden sm:inline">
+            <span className="hidden md:inline shrink-0 whitespace-nowrap text-stone-500">
               INDIA · MULTILATERALS · REMOTE · ALL EXPERIENCE BANDS (0–10+ YRS)
             </span>
           </div>
         </div>
 
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-7">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:px-6">
+          <div className="flex items-center gap-3 shrink-0 min-w-0 xl:gap-5">
             <Link
               href="/"
-              className="flex items-baseline gap-2"
+              className="flex items-baseline gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <span className="font-serif-editorial text-2xl font-bold tracking-tight text-stone-950">
+              <span className="font-serif-editorial text-2xl font-bold tracking-tight text-stone-950 whitespace-nowrap">
                 Docket.
               </span>
-              <span className="font-mono-tabular text-[10px] font-semibold tracking-widest text-amber-900 uppercase">
+              <span className="font-mono-tabular text-[10px] font-semibold tracking-widest text-amber-900 uppercase whitespace-nowrap">
                 Policy Index
               </span>
             </Link>
 
-            <nav className="hidden items-center gap-0.5 lg:flex">
+            <nav className="hidden items-center gap-0.5 lg:flex shrink-0">
               {LINKS.map((item) => {
                 const active =
                   pathname === item.href ||
@@ -84,7 +84,7 @@ export function AppNav({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-3 py-1.5 text-xs font-semibold tracking-tight transition ${
+                    className={`whitespace-nowrap px-2 py-1.5 text-xs font-semibold tracking-tight transition xl:px-3 ${
                       active
                         ? "bg-stone-900 text-[#F6F3EC]"
                         : "text-stone-700 hover:bg-stone-200/70 hover:text-stone-950"
@@ -93,14 +93,14 @@ export function AppNav({
                     <span className="font-mono-tabular mr-1 text-[10px] opacity-60">
                       {item.code}
                     </span>
-                    {item.label}
+                    <span className="whitespace-nowrap">{item.label}</span>
                   </Link>
                 );
               })}
               {isMod && (
                 <Link
                   href="/admin"
-                  className={`px-3 py-1.5 text-xs font-semibold tracking-tight transition ${
+                  className={`whitespace-nowrap px-2 py-1.5 text-xs font-semibold tracking-tight transition xl:px-3 ${
                     pathname.startsWith("/admin")
                       ? "bg-amber-900 text-white"
                       : "text-amber-900 hover:bg-amber-100/70"
@@ -109,7 +109,7 @@ export function AppNav({
                   <span className="font-mono-tabular mr-1 text-[10px] opacity-70">
                     07
                   </span>
-                  Desk
+                  <span className="whitespace-nowrap">Desk</span>
                   {pendingCount > 0 && (
                     <span className="ml-1.5 bg-amber-900 px-1.5 py-0.5 font-mono-tabular text-[10px] text-white">
                       {pendingCount}
@@ -120,21 +120,22 @@ export function AppNav({
             </nav>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/submit"
-              className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-3 py-1.5 text-xs font-semibold text-stone-900 transition hover:bg-stone-900 hover:text-[#F6F3EC]"
+              className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-2.5 py-1.5 text-xs font-semibold text-stone-900 transition hover:bg-stone-900 hover:text-[#F6F3EC] sm:px-3 whitespace-nowrap shrink-0"
               title="Employers, Recruiters & Cohort: Post a mandate or vacancy (Zero login required)"
             >
-              <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Hire / Post Mandate</span>
-              <span className="sm:hidden">Post</span>
+              <Plus className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden xl:inline whitespace-nowrap">Hire / Post Mandate</span>
+              <span className="hidden sm:inline xl:hidden whitespace-nowrap">Post Mandate</span>
+              <span className="sm:hidden whitespace-nowrap">Post</span>
             </Link>
             {user ? (
               <>
                 <Link
                   href="/settings"
-                  className={`px-2.5 py-1.5 font-mono-tabular text-xs font-medium ${
+                  className={`px-2.5 py-1.5 font-mono-tabular text-xs font-medium whitespace-nowrap shrink-0 ${
                     pathname.startsWith("/settings")
                       ? "bg-stone-900 text-[#F6F3EC]"
                       : "border border-stone-300 bg-[#FBF9F4] text-stone-800 hover:border-stone-900"
@@ -146,7 +147,7 @@ export function AppNav({
                 <button
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className="border border-stone-300 bg-[#FBF9F4] p-1.5 text-stone-600 hover:border-stone-900 hover:text-stone-950 disabled:opacity-50"
+                  className="border border-stone-300 bg-[#FBF9F4] p-1.5 text-stone-600 hover:border-stone-900 hover:text-stone-950 disabled:opacity-50 shrink-0"
                   title="Sign out"
                 >
                   {isSigningOut ? (
@@ -159,10 +160,11 @@ export function AppNav({
             ) : (
               <Link
                 href="/sign-in"
-                className="border border-stone-900 bg-stone-900 px-2.5 py-1.5 text-xs font-semibold tracking-wide text-[#F6F3EC] uppercase hover:bg-stone-800 sm:px-4"
+                className="border border-stone-900 bg-stone-900 px-2.5 py-1.5 text-xs font-semibold tracking-wide text-[#F6F3EC] uppercase hover:bg-stone-800 sm:px-3.5 whitespace-nowrap shrink-0"
               >
-                <span className="hidden sm:inline">Sign In to Track →</span>
-                <span className="sm:hidden">Sign In →</span>
+                <span className="hidden xl:inline whitespace-nowrap">Sign In to Track →</span>
+                <span className="hidden sm:inline xl:hidden whitespace-nowrap">Sign In →</span>
+                <span className="sm:hidden whitespace-nowrap">Sign In</span>
               </Link>
             )}
           </div>
@@ -178,7 +180,7 @@ export function AppNav({
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-1 flex-col items-center justify-center rounded-none px-1 py-1 transition ${
+              className={`flex flex-1 flex-col items-center justify-center rounded-none px-0.5 py-1 transition ${
                 active
                   ? "bg-stone-900 text-[#F6F3EC]"
                   : "text-stone-700 hover:text-stone-950"
@@ -188,7 +190,8 @@ export function AppNav({
                 {item.code}
               </span>
               <span className="whitespace-nowrap text-[10px] font-semibold sm:text-[11px]">
-                {item.label}
+                <span className="sm:hidden">{item.shortLabel ?? item.label}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </span>
             </Link>
           );
@@ -196,7 +199,7 @@ export function AppNav({
         {isMod && (
           <Link
             href="/admin"
-            className={`flex flex-1 flex-col items-center justify-center rounded-none px-1 py-1 transition ${
+            className={`flex flex-1 flex-col items-center justify-center rounded-none px-0.5 py-1 transition ${
               pathname.startsWith("/admin")
                 ? "bg-amber-900 text-white"
                 : "text-amber-900 hover:bg-amber-100/70"

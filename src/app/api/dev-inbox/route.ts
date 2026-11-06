@@ -4,11 +4,6 @@ import { db, schema } from "@/db";
 import { desc } from "drizzle-orm";
 
 export async function GET() {
-  const isConsole = (process.env.EMAIL_PROVIDER ?? "console") === "console";
-  if (!isConsole) {
-    return NextResponse.json({ enabled: false, emails: [] });
-  }
-
   try {
     const rows = await db
       .select()
@@ -31,8 +26,9 @@ export async function GET() {
     console.warn("[api/dev-inbox] DB read fallback:", e);
   }
 
+  const isConsole = (process.env.EMAIL_PROVIDER ?? "console") === "console";
   return NextResponse.json({
-    enabled: true,
-    emails: getRecentDevEmails(),
+    enabled: isConsole,
+    emails: isConsole ? getRecentDevEmails() : [],
   });
 }

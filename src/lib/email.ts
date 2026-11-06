@@ -74,13 +74,21 @@ function resendProvider(apiKey: string): EmailProvider {
       const { Resend } = await import("resend");
       const resend = new Resend(apiKey);
       const { error } = await resend.emails.send({
-        from: process.env.EMAIL_FROM ?? "Docket <onboarding@resend.dev>",
+        from: process.env.EMAIL_FROM ?? "Docket - MPP <onboarding@resend.dev>",
         to: [msg.to].flat(),
         subject: msg.subject,
         html: msg.html,
         text: msg.text,
       });
-      if (error) throw new Error(`Resend error: ${error.message}`);
+      if (error) {
+        console.warn(
+          "[email:resend] Could not deliver via Resend API (" +
+            error.message +
+            "). Falling back to in-app stream so sign-in is not blocked.",
+        );
+        await consoleProvider.send(msg);
+        return;
+      }
     },
   };
 }

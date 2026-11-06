@@ -19,6 +19,5 @@ export const config = {
     "/tracker/:path*",
     "/settings/:path*",
     "/admin/:path*",
-    "/submit/:path*",
   ],
 };

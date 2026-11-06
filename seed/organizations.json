@@ -1,0 +1,1350 @@
+[
+  {
+    "slug": "pwc-india",
+    "name": "PwC India",
+    "website": "https://www.pwc.in",
+    "careersUrl": "https://www.pwc.in/careers.html",
+    "category": "consulting",
+    "sectors": [
+      "government",
+      "development",
+      "finance",
+      "urban",
+      "climate",
+      "tech_ai"
+    ],
+    "hq": "Gurugram / Mumbai",
+    "description": "Multinational professional services network with a large Government and Public Sector (G&PS) advisory practice in India working with central and state ministries.",
+    "source": {
+      "type": "workday",
+      "config": {
+        "host": "pwc.wd3.myworkdayjobs.com",
+        "tenant": "pwc",
+        "site": "Global_Experienced_Careers",
+        "searchText": "Government Public Sector India",
+        "locationHint": "India"
+      }
+    }
+  },
+  {
+    "slug": "ey-india",
+    "name": "EY India",
+    "website": "https://www.ey.com/en_in",
+    "careersUrl": "https://careers.ey.com/ey/search/?q=government+public+sector&locationsearch=India",
+    "category": "consulting",
+    "sectors": [
+      "government",
+      "development",
+      "finance",
+      "urban",
+      "tech_ai",
+      "climate"
+    ],
+    "hq": "Gurugram / Mumbai",
+    "description": "Global consulting firm whose Government and Public Sector practice in India staffs policy management units, digital governance initiatives, and infrastructure reforms.",
+    "source": {
+      "type": "workday",
+      "config": {
+        "host": "eyglobal.wd1.myworkdayjobs.com",
+        "tenant": "eyglobal",
+        "site": "EY_Careers",
+        "searchText": "India Public Sector Policy Government"
+      }
+    }
+  },
+  {
+    "slug": "deloitte-india",
+    "name": "Deloitte India",
+    "website": "https://www2.deloitte.com/in/en.html",
+    "careersUrl": "https://jobsindia.deloitte.com/search/?q=public+sector",
+    "category": "consulting",
+    "sectors": [
+      "government",
+      "development",
+      "finance",
+      "urban",
+      "health",
+      "climate"
+    ],
+    "hq": "Mumbai / Gurugram",
+    "description": "Professional services firm providing public finance, economic policy, urban infrastructure, and social sector advisory across Indian central and state governments.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://jobsindia.deloitte.com/search/?q=public+sector",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "prs-legislative-research",
+    "name": "PRS Legislative Research",
+    "website": "https://prsindia.org",
+    "careersUrl": "https://prsindia.org/careers",
+    "category": "research",
+    "sectors": [
+      "government",
+      "regulation",
+      "finance",
+      "development"
+    ],
+    "hq": "New Delhi",
+    "description": "Independent non-profit research initiative that tracks the functioning of the Indian Parliament and state legislatures and provides non-partisan legislative analysis.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://prsindia.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "gates-foundation",
+    "name": "Bill & Melinda Gates Foundation",
+    "website": "https://www.gatesfoundation.org",
+    "careersUrl": "https://gatesfoundation.wd1.myworkdayjobs.com/Gates",
+    "category": "foundation",
+    "sectors": [
+      "health",
+      "development",
+      "agriculture",
+      "gender",
+      "finance"
+    ],
+    "hq": "Seattle (India Country Office: New Delhi)",
+    "description": "Global philanthropic foundation working closely with Indian central and state governments on public health, sanitation, digital financial inclusion, agricultural development, and gender equality.",
+    "source": {
+      "type": "workday",
+      "config": {
+        "host": "gatesfoundation.wd1.myworkdayjobs.com",
+        "tenant": "gatesfoundation",
+        "site": "Gates",
+        "searchText": "India",
+        "locationHint": "India"
+      }
+    }
+  },
+  {
+    "slug": "nation-with-namo",
+    "name": "Nation with NaMo",
+    "website": "https://www.nationwithnamo.com",
+    "careersUrl": "https://www.nationwithnamo.com/careers",
+    "category": "political",
+    "sectors": [
+      "government",
+      "development"
+    ],
+    "hq": "New Delhi",
+    "description": "Political consulting and citizen-engagement organization working on governance campaigns, constituency research, and electoral strategy in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.nationwithnamo.com/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "nfprc",
+    "name": "Nation First Policy Research Centre (NFPRC)",
+    "website": "https://nfprc.org",
+    "careersUrl": "https://nfprc.org/careers/",
+    "category": "think_tank",
+    "sectors": [
+      "government",
+      "development",
+      "regulation",
+      "education"
+    ],
+    "hq": "New Delhi",
+    "description": "Public policy think tank conducting research, field studies, and fellowships on governance, constitutional affairs, and socio-economic development in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://nfprc.org/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "ceew",
+    "name": "Council on Energy, Environment and Water (CEEW)",
+    "website": "https://www.ceew.in",
+    "careersUrl": "https://ceew.zohorecruit.in/jobs/Careers",
+    "category": "think_tank",
+    "sectors": [
+      "climate",
+      "agriculture",
+      "urban",
+      "finance",
+      "government"
+    ],
+    "hq": "New Delhi",
+    "description": "Not-for-profit policy research institution that uses data and integrated analysis to explain and change the use, reuse, and misuse of resources in India and globally.",
+    "source": {
+      "type": "zohorecruit",
+      "config": {
+        "host": "ceew.zohorecruit.in",
+        "pagename": "Careers"
+      }
+    }
+  },
+  {
+    "slug": "wri-india",
+    "name": "WRI India",
+    "website": "https://wri-india.org",
+    "careersUrl": "https://wri-india.org/careers",
+    "category": "research",
+    "sectors": [
+      "climate",
+      "urban",
+      "agriculture",
+      "development"
+    ],
+    "hq": "New Delhi / Mumbai / Bengaluru",
+    "description": "Research organization providing objective information and practical proposals for environmentally sound and socially equitable development across Indian cities, energy, and landscapes.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://wri-india.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "jpal-south-asia",
+    "name": "J-PAL South Asia",
+    "website": "https://www.povertyactionlab.org/south-asia",
+    "careersUrl": "https://www.povertyactionlab.org/careers",
+    "category": "research",
+    "sectors": [
+      "development",
+      "health",
+      "education",
+      "agriculture",
+      "gender",
+      "climate",
+      "government"
+    ],
+    "hq": "New Delhi (IFMR)",
+    "description": "Regional office of the Abdul Latif Jameel Poverty Action Lab hosted at IFMR that conducts randomized evaluations and partners with Indian governments to scale evidence-informed social programs.",
+    "source": {
+      "type": "smartrecruiters",
+      "config": {
+        "company": "JPAL",
+        "country": "IN"
+      }
+    }
+  },
+  {
+    "slug": "world-bank",
+    "name": "World Bank",
+    "website": "https://www.worldbank.org/en/country/india",
+    "careersUrl": "https://worldbankgroup.csod.com/ats/careersite/search.aspx?site=1&c=worldbankgroup",
+    "category": "multilateral",
+    "sectors": [
+      "development",
+      "finance",
+      "climate",
+      "urban",
+      "health",
+      "education",
+      "agriculture",
+      "government"
+    ],
+    "hq": "Washington, D.C. (India Office: New Delhi)",
+    "description": "International financial institution providing financing, policy advice, and technical assistance to central and state governments in India across infrastructure, human capital, and climate resilience.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://worldbankgroup.csod.com/ats/careersite/search.aspx?site=1&c=worldbankgroup",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "crisp-india",
+    "name": "Centre for Research in Schemes and Policies (CRISP)",
+    "website": "https://crispindia.net",
+    "careersUrl": "https://crispindia.net/work-with-us/",
+    "category": "ngo",
+    "sectors": [
+      "government",
+      "development",
+      "education",
+      "agriculture"
+    ],
+    "hq": "New Delhi / Hyderabad",
+    "description": "Non-profit organization founded by former senior civil servants to partner with central and state governments in designing, implementing, and evaluating public welfare schemes.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://crispindia.net/work-with-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "microsave-consulting",
+    "name": "MicroSave Consulting (MSC)",
+    "website": "https://www.microsave.net",
+    "careersUrl": "https://www.microsave.net/careers/",
+    "category": "consulting",
+    "sectors": [
+      "finance",
+      "development",
+      "government",
+      "agriculture",
+      "gender",
+      "health"
+    ],
+    "hq": "Lucknow / Gurugram",
+    "description": "Boutique development consulting firm specializing in financial, social, and economic inclusion across Asia and Africa, with deep advisory work in Indian digital public infrastructure and direct benefit transfers.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.microsave.net/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "bowergroupasia",
+    "name": "BowerGroupAsia (BGA)",
+    "website": "https://bowergroupasia.com",
+    "careersUrl": "https://bowergroupasia.com/careers/",
+    "category": "consulting",
+    "sectors": [
+      "regulation",
+      "tech_ai",
+      "government",
+      "finance",
+      "health",
+      "climate"
+    ],
+    "hq": "Washington, D.C. (India Office: New Delhi)",
+    "description": "Strategic advisory firm that helps multinational companies navigate public policy, regulatory affairs, and government relations across the Indo-Pacific, including India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://bowergroupasia.com/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "egov-foundation",
+    "name": "eGov Foundation",
+    "website": "https://egov.org.in",
+    "careersUrl": "https://egov.org.in/careers/",
+    "category": "tech",
+    "sectors": [
+      "tech_ai",
+      "government",
+      "urban",
+      "health",
+      "finance"
+    ],
+    "hq": "Bengaluru",
+    "description": "Digital public goods organization that builds open-source platforms like DIGIT to transform urban governance, public health delivery, and municipal service management across India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://egov.org.in/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "graam",
+    "name": "Grassroots Research and Advocacy Movement (GRAAM)",
+    "website": "https://graam.org.in",
+    "careersUrl": "https://graam.org.in/career/",
+    "category": "research",
+    "sectors": [
+      "development",
+      "education",
+      "health",
+      "agriculture",
+      "government"
+    ],
+    "hq": "Mysuru",
+    "description": "Public policy research and advocacy initiative headquartered in Mysuru that incorporates grassroots community perspectives into empirical policy evaluation and governance consulting.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://graam.org.in/career/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "pravi-research",
+    "name": "Pravi Research",
+    "website": "https://www.praviresearch.com/home.html",
+    "careersUrl": "https://www.praviresearch.com/home.html",
+    "category": "research",
+    "sectors": [
+      "development",
+      "government",
+      "education",
+      "health",
+      "gender"
+    ],
+    "hq": "New Delhi",
+    "description": "Research and advisory organization conducting field evaluations, impact assessments, and policy research on social development and governance in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.praviresearch.com/home.html",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "wadhwani-ai",
+    "name": "Wadhwani AI",
+    "website": "https://www.wadhwaniai.org",
+    "careersUrl": "https://www.wadhwaniai.org/careers/",
+    "category": "tech",
+    "sectors": [
+      "tech_ai",
+      "health",
+      "agriculture",
+      "education",
+      "government"
+    ],
+    "hq": "Mumbai / New Delhi",
+    "description": "Independent non-profit institute developing and deploying AI solutions for social good in public health, agriculture, education, and public infrastructure in partnership with Indian ministries.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.wadhwaniai.org/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "wadhwani-foundation",
+    "name": "Wadhwani Foundation",
+    "website": "https://wadhwanifoundation.org",
+    "careersUrl": "https://careers.wfglobal.org/jobs/Careers",
+    "category": "foundation",
+    "sectors": [
+      "development",
+      "education",
+      "government",
+      "tech_ai"
+    ],
+    "hq": "Bengaluru",
+    "description": "Global not-for-profit organization focused on accelerating job growth through skilling, entrepreneurship, innovation, and government digital transformation programs in India and emerging economies.",
+    "source": {
+      "type": "zohorecruit",
+      "config": {
+        "host": "careers.wfglobal.org",
+        "pagename": "Careers"
+      }
+    }
+  },
+  {
+    "slug": "sarvam-ai",
+    "name": "Sarvam AI",
+    "website": "https://www.sarvam.ai",
+    "careersUrl": "https://www.sarvam.ai/careers",
+    "category": "tech",
+    "sectors": [
+      "tech_ai",
+      "government",
+      "regulation"
+    ],
+    "hq": "Bengaluru",
+    "description": "Indian generative AI company building sovereign foundational models, voice interfaces in Indian languages, and population-scale AI applications aligned with India's Digital Public Infrastructure.",
+    "source": {
+      "type": "ashby",
+      "config": {
+        "org": "sarvam"
+      }
+    }
+  },
+  {
+    "slug": "cpr-india",
+    "name": "Centre for Policy Research (CPR)",
+    "website": "https://cprindia.org",
+    "careersUrl": "https://cprindia.org/work-with-us/",
+    "category": "think_tank",
+    "sectors": [
+      "government",
+      "urban",
+      "climate",
+      "regulation",
+      "development",
+      "finance"
+    ],
+    "hq": "New Delhi",
+    "description": "One of India's oldest public policy think tanks, conducting multidisciplinary scholarship on state capacity, urbanisation, climate policy, accountability, and international relations.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://cprindia.org/work-with-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "orf",
+    "name": "Observer Research Foundation (ORF)",
+    "website": "https://www.orfonline.org",
+    "careersUrl": "https://www.orfonline.org/careers",
+    "category": "think_tank",
+    "sectors": [
+      "government",
+      "tech_ai",
+      "climate",
+      "finance",
+      "development",
+      "regulation"
+    ],
+    "hq": "New Delhi",
+    "description": "Independent global think tank based in India providing research and convene platforms on geopolitics, geoeconomics, tech policy, energy transition, and sustainable development.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.orfonline.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "carnegie-india",
+    "name": "Carnegie India",
+    "website": "https://carnegieendowment.org/global-centers/india",
+    "careersUrl": "https://carnegieendowment.org/careers",
+    "category": "think_tank",
+    "sectors": [
+      "tech_ai",
+      "finance",
+      "government",
+      "regulation"
+    ],
+    "hq": "New Delhi",
+    "description": "New Delhi center of the Carnegie Endowment for International Peace focusing on technology and society, political economy, and security studies in India and South Asia.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://carnegieendowment.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "takshashila-institution",
+    "name": "The Takshashila Institution",
+    "website": "https://takshashila.org.in",
+    "careersUrl": "https://takshashila.org.in/careers",
+    "category": "think_tank",
+    "sectors": [
+      "government",
+      "tech_ai",
+      "regulation",
+      "finance",
+      "health"
+    ],
+    "hq": "Bengaluru",
+    "description": "Independent center for research and education in public policy focusing on strategic affairs, high-tech geopolitics, economic policy, and public policy education.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://takshashila.org.in/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "dasra",
+    "name": "Dasra",
+    "website": "https://www.dasra.org",
+    "careersUrl": "https://www.dasra.org/careers",
+    "category": "ngo",
+    "sectors": [
+      "development",
+      "gender",
+      "health",
+      "education",
+      "urban",
+      "climate"
+    ],
+    "hq": "Mumbai",
+    "description": "Strategic philanthropy organization that connects funders, non-profits, and government systems to accelerate social impact across health, adolescence, urban sanitation, and governance.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.dasra.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "dalberg",
+    "name": "Dalberg Advisors",
+    "website": "https://dalberg.com",
+    "careersUrl": "https://dalberg.com/join-us/",
+    "category": "consulting",
+    "sectors": [
+      "development",
+      "climate",
+      "health",
+      "education",
+      "agriculture",
+      "finance",
+      "gender",
+      "tech_ai"
+    ],
+    "hq": "Mumbai / New Delhi",
+    "description": "Global impact advisory firm combining strategy consulting, design thinking, and data analytics to address pressing development challenges with foundations, governments, and multilaterals.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://dalberg.com/join-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "niti-aayog",
+    "name": "NITI Aayog",
+    "website": "https://www.niti.gov.in",
+    "careersUrl": "https://www.niti.gov.in/career/work-with-niti",
+    "category": "government",
+    "sectors": [
+      "government",
+      "development",
+      "climate",
+      "health",
+      "education",
+      "agriculture",
+      "tech_ai",
+      "urban",
+      "finance"
+    ],
+    "hq": "New Delhi",
+    "description": "Apex public policy think tank of the Government of India driving cooperative federalism, national development strategies, Aspirational Districts, and frontier tech policy.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.niti.gov.in/career/work-with-niti",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "vidhi-legal-policy",
+    "name": "Vidhi Centre for Legal Policy",
+    "website": "https://vidhilegalpolicy.in",
+    "careersUrl": "https://vidhilegalpolicy.in/careers/",
+    "category": "think_tank",
+    "sectors": [
+      "regulation",
+      "government",
+      "tech_ai",
+      "climate",
+      "health",
+      "finance"
+    ],
+    "hq": "New Delhi / Bengaluru",
+    "description": "Independent think tank doing legal research and legislative drafting to make better laws and improve governance for public good in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://vidhilegalpolicy.in/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "ikigai-law",
+    "name": "Ikigai Law",
+    "website": "https://www.ikigailaw.com",
+    "careersUrl": "https://www.ikigailaw.com/work-with-us/",
+    "category": "consulting",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "finance"
+    ],
+    "hq": "New Delhi",
+    "description": "Award-winning law and public policy firm specializing in technology regulation, AI governance, digital payments, telecom, aerospace, and data protection in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.ikigailaw.com/work-with-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "koan-advisory",
+    "name": "Koan Advisory Group",
+    "website": "https://www.koanadvisory.com",
+    "careersUrl": "https://www.koanadvisory.com/careers/",
+    "category": "consulting",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "finance",
+      "climate",
+      "government"
+    ],
+    "hq": "New Delhi",
+    "description": "New-age public policy consultancy specializing in technology, media, digital trade, competition law, and emerging regulatory landscapes in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.koanadvisory.com/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "esya-centre",
+    "name": "Esya Centre",
+    "website": "https://www.esyacentre.org",
+    "careersUrl": "https://www.esyacentre.org/careers",
+    "category": "think_tank",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "finance"
+    ],
+    "hq": "New Delhi",
+    "description": "Technology policy think tank generating empirical research on digital economy, artificial intelligence, intellectual property, and regulatory design in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.esyacentre.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "csep",
+    "name": "Centre for Social and Economic Progress (CSEP)",
+    "website": "https://csep.org",
+    "careersUrl": "https://csep.org/careers/",
+    "category": "think_tank",
+    "sectors": [
+      "finance",
+      "climate",
+      "health",
+      "government",
+      "development",
+      "regulation"
+    ],
+    "hq": "New Delhi",
+    "description": "Independent public policy think tank (formerly Brookings India) conducting policy-relevant research on economic growth, energy and resource security, health, and foreign policy.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://csep.org/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "icrier",
+    "name": "Indian Council for Research on International Economic Relations (ICRIER)",
+    "website": "https://icrier.org",
+    "careersUrl": "https://icrier.org/work-with-us/",
+    "category": "think_tank",
+    "sectors": [
+      "finance",
+      "agriculture",
+      "climate",
+      "tech_ai",
+      "urban",
+      "development"
+    ],
+    "hq": "New Delhi",
+    "description": "Premier economic policy think tank conducting research on trade, macroeconomics, agriculture, digital economy, climate change, and urbanisation in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://icrier.org/work-with-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "nipfp",
+    "name": "National Institute of Public Finance and Policy (NIPFP)",
+    "website": "https://www.nipfp.org.in",
+    "careersUrl": "https://www.nipfp.org.in/jobs/",
+    "category": "research",
+    "sectors": [
+      "finance",
+      "government",
+      "regulation",
+      "development"
+    ],
+    "hq": "New Delhi",
+    "description": "Autonomous research institute under the Ministry of Finance conducting advanced research in public economics, taxation, fiscal federalism, and financial sector regulation.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.nipfp.org.in/jobs/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "accountability-initiative",
+    "name": "Accountability Initiative",
+    "website": "https://accountabilityindia.in",
+    "careersUrl": "https://accountabilityindia.in/work-with-us/",
+    "category": "research",
+    "sectors": [
+      "government",
+      "finance",
+      "education",
+      "health",
+      "development"
+    ],
+    "hq": "New Delhi",
+    "description": "Research group focused on transparent and accountable governance in India, renowned for its Budget Briefs and frontline expenditure tracking of social sector schemes.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://accountabilityindia.in/work-with-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "janaagraha",
+    "name": "Janaagraha Centre for Citizenship and Democracy",
+    "website": "https://www.janaagraha.org",
+    "careersUrl": "https://www.janaagraha.org/careers/",
+    "category": "ngo",
+    "sectors": [
+      "urban",
+      "government",
+      "finance",
+      "development"
+    ],
+    "hq": "Bengaluru",
+    "description": "Non-profit institution working with citizens and governments to transform the quality of life in India's cities and towns through municipal finance, urban planning, and civic participation reforms.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.janaagraha.org/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "piramal-foundation",
+    "name": "Piramal Foundation",
+    "website": "https://www.piramalfoundation.org",
+    "careersUrl": "https://www.piramalfoundation.org/careers",
+    "category": "foundation",
+    "sectors": [
+      "health",
+      "education",
+      "development",
+      "government",
+      "gender"
+    ],
+    "hq": "Mumbai / New Delhi",
+    "description": "Philanthropic arm of the Piramal Group working across Aspirational Districts to strengthen public systems in healthcare, school leadership, water security, and digital transformation.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.piramalfoundation.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "tata-trusts",
+    "name": "Tata Trusts",
+    "website": "https://www.tatatrusts.org",
+    "careersUrl": "https://www.tatatrusts.org/careers",
+    "category": "foundation",
+    "sectors": [
+      "health",
+      "education",
+      "agriculture",
+      "development",
+      "urban",
+      "climate",
+      "gender"
+    ],
+    "hq": "Mumbai",
+    "description": "Among India's oldest philanthropic foundations catalyzing sustainable development in nutrition, healthcare, rural livelihoods, education, water, and social justice.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.tatatrusts.org/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "azim-premji-foundation",
+    "name": "Azim Premji Foundation",
+    "website": "https://azimpremjifoundation.org",
+    "careersUrl": "https://azimpremjifoundation.org/careers/",
+    "category": "foundation",
+    "sectors": [
+      "education",
+      "health",
+      "development",
+      "government"
+    ],
+    "hq": "Bengaluru",
+    "description": "Not-for-profit organization working extensively with state governments on public school education systems, community health, and philanthropic grants for vulnerable populations across India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://azimpremjifoundation.org/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "undp-india",
+    "name": "UNDP India",
+    "website": "https://www.undp.org/india",
+    "careersUrl": "https://estm.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/requisitions?location=India&locationId=300000000306761",
+    "category": "multilateral",
+    "sectors": [
+      "development",
+      "climate",
+      "government",
+      "gender",
+      "health"
+    ],
+    "hq": "New Delhi",
+    "description": "United Nations Development Programme country office in India partnering with ministries and state governments on SDG localization, climate resilience, inclusive growth, and systems strengthening.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://estm.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/requisitions?location=India&locationId=300000000306761",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "unicef-india",
+    "name": "UNICEF India",
+    "website": "https://www.unicef.org/india/",
+    "careersUrl": "https://jobs.unicef.org/en-us/filter/?location=india",
+    "category": "multilateral",
+    "sectors": [
+      "health",
+      "education",
+      "gender",
+      "development",
+      "government"
+    ],
+    "hq": "New Delhi",
+    "description": "United Nations agency working in India with central and state governments to protect child rights, maternal and child nutrition, immunization, WASH, and social policy.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://jobs.unicef.org/en-us/filter/?location=india",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "who-india",
+    "name": "World Health Organization (WHO) India",
+    "website": "https://www.who.int/india",
+    "careersUrl": "https://www.who.int/careers",
+    "category": "multilateral",
+    "sectors": [
+      "health",
+      "government",
+      "regulation"
+    ],
+    "hq": "New Delhi",
+    "description": "United Nations specialized agency on public health collaborating with the Ministry of Health and Family Welfare on disease surveillance, universal health coverage, and health systems policy in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.who.int/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "adb",
+    "name": "Asian Development Bank (ADB)",
+    "website": "https://www.adb.org/where-we-work/india",
+    "careersUrl": "https://www.adb.org/work-with-us/careers/current-opportunities",
+    "category": "multilateral",
+    "sectors": [
+      "finance",
+      "urban",
+      "climate",
+      "development",
+      "agriculture",
+      "government"
+    ],
+    "hq": "Manila (India Resident Mission: New Delhi)",
+    "description": "Regional development bank supporting India's infrastructure, clean energy transition, urban mobility, industrial corridors, and public sector management.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.adb.org/work-with-us/careers/current-opportunities",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "ifc",
+    "name": "International Finance Corporation (IFC)",
+    "website": "https://www.ifc.org",
+    "careersUrl": "https://www.ifc.org/en/about/careers",
+    "category": "multilateral",
+    "sectors": [
+      "finance",
+      "climate",
+      "development",
+      "urban",
+      "agriculture",
+      "health"
+    ],
+    "hq": "Washington, D.C. (India Offices: New Delhi / Mumbai)",
+    "description": "Private-sector arm of the World Bank Group investing in and advising sustainable enterprises, green finance, and infrastructure projects across India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.ifc.org/en/about/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "oecd",
+    "name": "Organisation for Economic Co-operation and Development (OECD)",
+    "website": "https://www.oecd.org",
+    "careersUrl": "https://www.oecd.org/en/about/careers.html",
+    "category": "multilateral",
+    "sectors": [
+      "finance",
+      "regulation",
+      "climate",
+      "education",
+      "tech_ai",
+      "government",
+      "development"
+    ],
+    "hq": "Paris",
+    "description": "International policy organization that sets global economic, tax, AI governance, climate, and education standards, engaging closely with India as a Key Partner country.",
+    "source": {
+      "type": "smartrecruiters",
+      "config": {
+        "company": "OECD"
+      }
+    }
+  },
+  {
+    "slug": "internet-freedom-foundation",
+    "name": "Internet Freedom Foundation (IFF)",
+    "website": "https://internetfreedom.in",
+    "careersUrl": "https://internetfreedom.in/jobs/",
+    "category": "advocacy",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "government"
+    ],
+    "hq": "New Delhi",
+    "description": "Indian digital rights advocacy organization working on privacy, free speech, net neutrality, surveillance reform, and constitutional technology policy through strategic litigation and parliamentary engagement.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://internetfreedom.in/jobs/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "idinsight",
+    "name": "IDinsight",
+    "website": "https://www.idinsight.org",
+    "careersUrl": "https://www.idinsight.org/careers/",
+    "category": "research",
+    "sectors": [
+      "development",
+      "health",
+      "education",
+      "agriculture",
+      "government",
+      "gender",
+      "tech_ai"
+    ],
+    "hq": "New Delhi (India Office)",
+    "description": "Mission-driven global advisory, data analytics, and research organization that helps Indian policy leaders use rigorous evidence and machine learning for social impact.",
+    "source": {
+      "type": "ashby",
+      "config": {
+        "org": "idinsight"
+      }
+    }
+  },
+  {
+    "slug": "sattva-consulting",
+    "name": "Sattva Consulting",
+    "website": "https://www.sattva.co.in",
+    "careersUrl": "https://careers.kula.ai/sattva",
+    "category": "consulting",
+    "sectors": [
+      "development",
+      "education",
+      "health",
+      "climate",
+      "gender",
+      "agriculture",
+      "finance"
+    ],
+    "hq": "Bengaluru / New Delhi / Mumbai",
+    "description": "Social impact strategy and implementation consulting firm partnering with foundations, CSR leaders, and governments across India to design and scale sustainable development programs.",
+    "source": {
+      "type": "kula",
+      "config": {
+        "board": "sattva"
+      }
+    }
+  },
+  {
+    "slug": "samagra",
+    "name": "Samagra | Transforming Governance",
+    "website": "https://samagragovernance.in",
+    "careersUrl": "https://samagragovernance.in/careers/",
+    "category": "consulting",
+    "sectors": [
+      "government",
+      "education",
+      "agriculture",
+      "health",
+      "tech_ai",
+      "development"
+    ],
+    "hq": "Gurugram",
+    "description": "Mission-driven governance consulting firm working directly with chief ministers' offices and state departments in India to improve citizen service delivery at scale using data and technology.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://samagragovernance.in/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "global-health-strategies",
+    "name": "Global Health Strategies (GHS)",
+    "website": "https://globalhealthstrategies.com",
+    "careersUrl": "https://globalhealthstrategies.com/join-us/",
+    "category": "consulting",
+    "sectors": [
+      "health",
+      "gender",
+      "development",
+      "government"
+    ],
+    "hq": "New York (India Office: New Delhi)",
+    "description": "International consulting firm specializing in health policy advocacy, strategic communications, and stakeholder mobilization across immunization, infectious diseases, and maternal health in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://globalhealthstrategies.com/join-us/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "path",
+    "name": "PATH",
+    "website": "https://www.path.org",
+    "careersUrl": "https://path.wd1.myworkdayjobs.com/External",
+    "category": "ngo",
+    "sectors": [
+      "health",
+      "tech_ai",
+      "government",
+      "development"
+    ],
+    "hq": "Seattle (India Office: New Delhi)",
+    "description": "Global team of innovators working to accelerate health equity in India through vaccines, diagnostics, digital health systems, primary healthcare, and infectious disease control.",
+    "source": {
+      "type": "workday",
+      "config": {
+        "host": "path.wd1.myworkdayjobs.com",
+        "tenant": "path",
+        "site": "External",
+        "searchText": "India",
+        "locationHint": "India"
+      }
+    }
+  },
+  {
+    "slug": "phfi",
+    "name": "Public Health Foundation of India (PHFI)",
+    "website": "https://phfi.org",
+    "careersUrl": "https://phfi.org/vacancies/",
+    "category": "research",
+    "sectors": [
+      "health",
+      "education",
+      "government",
+      "climate"
+    ],
+    "hq": "New Delhi / Gurugram",
+    "description": "Public-private initiative established to strengthen institutional capacity in public health training, epidemiological research, and health policy development in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://phfi.org/vacancies/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "ipe-global",
+    "name": "IPE Global",
+    "website": "https://www.ipeglobal.com",
+    "careersUrl": "https://www.ipeglobal.com/careers/",
+    "category": "consulting",
+    "sectors": [
+      "development",
+      "urban",
+      "health",
+      "education",
+      "climate",
+      "government",
+      "gender"
+    ],
+    "hq": "New Delhi",
+    "description": "International development consulting group headquartered in India providing technical assistance, monitoring and evaluation, and policy reform support to governments and bilateral agencies.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.ipeglobal.com/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "athena-infonomics",
+    "name": "Athena Infonomics",
+    "website": "https://www.athenainfonomics.com",
+    "careersUrl": "https://www.athenainfonomics.com/careers",
+    "category": "consulting",
+    "sectors": [
+      "development",
+      "urban",
+      "health",
+      "climate",
+      "finance",
+      "government",
+      "tech_ai"
+    ],
+    "hq": "Chennai / Washington, D.C. / New Delhi",
+    "description": "Data-driven global development consultancy founded in India that applies social science research, data analytics, and ICT solutions to public policy and WASH, urban, and governance challenges.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.athenainfonomics.com/careers",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "digital-futures-lab",
+    "name": "Digital Futures Lab",
+    "website": "https://www.digitalfutureslab.in",
+    "careersUrl": "https://www.digitalfutureslab.in/work-with-us",
+    "category": "research",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "gender",
+      "climate",
+      "development"
+    ],
+    "hq": "Goa",
+    "description": "Multidisciplinary research studio examining the complex interaction between technology and society in the Majority World, with a focus on responsible AI, future of work, and digital rights in India.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://www.digitalfutureslab.in/work-with-us",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "aapti-institute",
+    "name": "Aapti Institute",
+    "website": "https://theaaptiinstitute.com",
+    "careersUrl": "https://theaaptiinstitute.com/careers/",
+    "category": "research",
+    "sectors": [
+      "tech_ai",
+      "regulation",
+      "government",
+      "development"
+    ],
+    "hq": "Bengaluru",
+    "description": "Public research institution working at the intersection of technology and society to build policy frameworks around data stewardship, digital public infrastructure, and platform economy.",
+    "source": {
+      "type": "page_watch",
+      "config": {
+        "url": "https://theaaptiinstitute.com/careers/",
+        "selector": null
+      }
+    }
+  },
+  {
+    "slug": "swaniti-initiative",
+    "name": "Swaniti Initiative",
+    "website": "https://www.swaniti.in",
+    "careersUrl": "https://swaniti.zohorecruit.in/jobs/Careers",
+    "category": "think_tank",
+    "sectors": [
+      "government",
+      "climate",
+      "development"
+    ],
+    "hq": "New Delhi, India",
+    "description": "Development & legislative constituency research organization working with MPs, state governments, and clean-energy transitions across India.",
+    "source": {
+      "type": "zohorecruit",
+      "config": {
+        "host": "swaniti.zohorecruit.in",
+        "pagename": "Careers"
+      }
+    }
+  },
+  {
+    "slug": "central-square-foundation",
+    "name": "Central Square Foundation (CSF)",
+    "website": "https://www.centralsquarefoundation.org",
+    "careersUrl": "https://www.careers-page.com/central-square-foundation",
+    "category": "ngo",
+    "sectors": [
+      "education",
+      "government",
+      "tech_ai"
+    ],
+    "hq": "New Delhi, India",
+    "description": "Leading education policy & system-reform foundation driving Foundational Literacy and Numeracy (FLN), EdTech, and State PMUs across India.",
+    "source": {
+      "type": "manatal",
+      "config": {
+        "slug": "central-square-foundation"
+      }
+    }
+  }
+]

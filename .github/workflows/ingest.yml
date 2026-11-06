@@ -1,0 +1,28 @@
+name: Docket Job Ingestion & Deadline Reminders
+
+on:
+  schedule:
+    # Runs every 6 hours to poll ATS feeds and careers-page watchers
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ingest-and-remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger job source ingestion
+        run: |
+          if [ -z "${{ secrets.APP_URL }}" ]; then
+            echo "Set APP_URL and CRON_SECRET in GitHub Actions secrets once deployed."
+            exit 0
+          fi
+          curl -fsSL -X POST "${{ secrets.APP_URL }}/api/cron/ingest" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+
+      - name: Trigger 7-day and 1-day deadline reminders
+        run: |
+          if [ -z "${{ secrets.APP_URL }}" ]; then
+            exit 0
+          fi
+          curl -fsSL -X POST "${{ secrets.APP_URL }}/api/cron/reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

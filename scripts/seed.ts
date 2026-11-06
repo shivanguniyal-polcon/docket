@@ -2,7 +2,7 @@ import "dotenv/config";
 import { config as loadEnv } from "dotenv";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, schema } from "../src/db";
 import { makeFingerprint } from "../src/lib/classify";
 
@@ -596,13 +596,25 @@ async function main() {
     totalIngested = ingestResults.reduce((acc, r) => acc + r.inserted, 0);
   }
 
-  // 4. Seed demo cohort personas (Owner, Moderator, 1st-year Student, Alumni) + sample notes & k-anonymous outcomes
+  // 4. Clean up any legacy demo personas and seed only the real Owner (Shivang Uniyal)
+  await db.execute(
+    sql.raw(`
+      DELETE FROM "user" WHERE email IN (
+        'owner@iitd.ac.in',
+        'ananya.mpp25@iitd.ac.in',
+        'rohan.mpp26@iitd.ac.in',
+        'meera.mpp23@iitd.ac.in',
+        'kabir.mpp22@iitd.ac.in'
+      );
+    `),
+  );
+
   const personas = [
     {
-      id: "usr_owner_iitd",
-      name: "Ganesh Uniyal (Owner)",
-      email: "owner@iitd.ac.in",
-      personalEmail: "ganesh.policy.backup@gmail.com",
+      id: "usr_owner_shivang",
+      name: "Shivang Uniyal",
+      email: "ppm254500@iitd.ac.in",
+      personalEmail: undefined as string | undefined,
       role: "owner",
       batch: "MPP 2025–27",
       headline: "MPP at IIT Delhi · Permanent Steward of Docket · Tech, AI & Regulatory Policy",
@@ -612,73 +624,8 @@ async function main() {
       alumniOptIn: true,
       openToReferrals: true,
       currentOrg: "SPP, IIT Delhi",
-      currentRole: "MPP Candidate",
+      currentRole: "MPP Candidate & Portal Owner",
       gradYear: 2027,
-    },
-    {
-      id: "usr_mod_ananya",
-      name: "Ananya Verma",
-      email: "ananya.mpp25@iitd.ac.in",
-      role: "moderator",
-      batch: "MPP 2025–27",
-      headline: "2nd-Year MPP · Climate Finance & Energy Transition · Former Summer Intern @ CEEW",
-      sectors: ["climate", "finance", "government"],
-      skills: ["Stata", "Energy Modelling", "Public Finance", "Policy Briefs"],
-      experienceLevel: "0-2",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "CEEW (Summer Alum)",
-      currentRole: "Student Moderator",
-      gradYear: 2027,
-    },
-    {
-      id: "usr_stu_rohan",
-      name: "Rohan Nair",
-      email: "rohan.mpp26@iitd.ac.in",
-      role: "member",
-      batch: "MPP 2026–28",
-      headline: "1st-Year MPP seeking Dec 2026 Winter Internship in Health & Development Policy",
-      sectors: ["health", "development", "government"],
-      skills: ["R", "Survey Design", "Qualitative Research", "Literature Review"],
-      experienceLevel: "0-2",
-      alumniOptIn: false,
-      openToReferrals: false,
-      currentOrg: "IIT Delhi",
-      currentRole: "1st-Year MPP Student",
-      gradYear: 2028,
-    },
-    {
-      id: "usr_alum_meera",
-      name: "Meera Krishnan",
-      email: "meera.mpp23@iitd.ac.in",
-      personalEmail: "meerakrishnan.policy@gmail.com",
-      role: "alumni",
-      batch: "MPP 2023–25",
-      headline: "MPP Alum · Senior Associate at Samagra Governance · Happy to refer IITD juniors",
-      sectors: ["government", "education", "tech_ai"],
-      skills: ["Governance Consulting", "PMU Delivery", "Data Analytics", "State Capacity"],
-      experienceLevel: "3-5",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "Samagra",
-      currentRole: "Senior Associate",
-      gradYear: 2025,
-    },
-    {
-      id: "usr_alum_kabir",
-      name: "Kabir Deshmukh",
-      email: "kabir.mpp22@iitd.ac.in",
-      role: "alumni",
-      batch: "MPP 2022–24",
-      headline: "MPP Alum · Policy Consultant at PwC India (G&PS) · Ex-LAMP Fellow",
-      sectors: ["government", "private_sector", "regulation", "finance"],
-      skills: ["Industrial Policy", "Legislative Research", "Public Procurement"],
-      experienceLevel: "3-5",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "PwC India",
-      currentRole: "Consultant (G&PS)",
-      gradYear: 2024,
     },
   ];
 
@@ -693,7 +640,14 @@ async function main() {
         role: p.role,
         batch: p.batch,
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: schema.user.email,
+        set: {
+          name: p.name,
+          role: p.role,
+          batch: p.batch,
+        },
+      });
 
     await db
       .insert(schema.userEmail)
@@ -704,18 +658,6 @@ async function main() {
         verifiedAt: new Date(),
       })
       .onConflictDoNothing();
-
-    if (p.personalEmail) {
-      await db
-        .insert(schema.userEmail)
-        .values({
-          userId: p.id,
-          email: p.personalEmail,
-          kind: "personal",
-          verifiedAt: new Date(),
-        })
-        .onConflictDoNothing();
-    }
 
     await db
       .insert(schema.profile)
@@ -731,17 +673,23 @@ async function main() {
         currentRole: p.currentRole,
         gradYear: p.gradYear,
         resumeText:
-          p.id === "usr_owner_iitd"
-            ? "Master of Public Policy (MPP), Indian Institute of Technology Delhi (IIT Delhi). Coursework: Econometrics, Public Policy Analysis, AI & Digital Regulation, Health Systems, Energy & Climate Policy. Skills: R, Python, Stata, Policy Briefs, Regulatory Analysis, Stakeholder Consultations, Impact Evaluation."
-            : null,
-        resumeFileName:
-          p.id === "usr_owner_iitd" ? "IITD_MPP_Policy_CV.pdf" : null,
-        resumeUpdatedAt: p.id === "usr_owner_iitd" ? new Date() : null,
+          "Master of Public Policy (MPP), Indian Institute of Technology Delhi (IIT Delhi). Coursework: Econometrics, Public Policy Analysis, AI & Digital Regulation, Health Systems, Energy & Climate Policy. Skills: R, Python, Stata, Policy Briefs, Regulatory Analysis, Stakeholder Consultations, Impact Evaluation.",
+        resumeFileName: "IITD_MPP_Policy_CV.pdf",
+        resumeUpdatedAt: new Date(),
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: schema.profile.userId,
+        set: {
+          headline: p.headline,
+          currentOrg: p.currentOrg,
+          currentRole: p.currentRole,
+          alumniOptIn: true,
+          openToReferrals: true,
+        },
+      });
   }
 
-  // 5. Seed sample cohort org notes & >= 5 anonymous outcomes on CEEW so k-anonymity funnel is demonstrable
+  // 5. Seed anonymous cohort org notes on CEEW, Samagra, and PRS
   const ceewId = slugToOrgId.get("ceew");
   const samagraId = slugToOrgId.get("samagra");
   const prsId = slugToOrgId.get("prs-legislative-research");
@@ -752,46 +700,29 @@ async function main() {
       await db.insert(schema.orgNote).values([
         {
           orgId: ceewId,
-          userId: "usr_mod_ananya",
-          batch: "MPP 2025–27",
-          anonymous: false,
+          userId: null,
+          batch: "MPP Cohort",
+          anonymous: true,
           kind: "interview",
           body: "CEEW hiring has 3 stages: (1) Shortlisting + 48-hour written/quant assignment specific to the team (e.g. power sector tariff analysis in Excel/R), (2) Technical interview with the Programme Lead + Senior Analyst (expect deep questions on your MPP thesis/capstone), and (3) Culture & leadership round with HR/Director.",
         },
         {
           orgId: ceewId,
-          userId: "usr_alum_kabir",
-          batch: "MPP 2022–24",
+          userId: null,
+          batch: "MPP Cohort",
           anonymous: true,
           kind: "timeline",
           body: "Winter internship calls usually go out in November; summer internship & Research Analyst calls open in February–March. Applying within the first 7 days of posting significantly helps.",
         },
       ]);
-
-      // 5 anonymous outcome records for CEEW to demonstrate the n >= 5 privacy threshold
-      const statuses = ["offer", "interviewing", "interviewing", "applied", "rejected"];
-      for (let i = 0; i < personas.length; i++) {
-        await db.insert(schema.application).values({
-          userId: personas[i].id,
-          orgId: ceewId,
-          title: "Research Intern / Analyst — Energy Transition",
-          orgName: "Council on Energy, Environment and Water (CEEW)",
-          url: "https://www.ceew.in/careers",
-          type: i < 2 ? "internship" : "full_time",
-          status: statuses[i],
-          deadline: "2026-12-05",
-          appliedAt: "2026-11-02",
-          shareOutcome: true,
-        });
-      }
     }
 
     if (samagraId) {
       await db.insert(schema.orgNote).values({
         orgId: samagraId,
-        userId: "usr_alum_meera",
-        batch: "MPP 2023–25",
-        anonymous: false,
+        userId: null,
+        batch: "MPP Cohort",
+        anonymous: true,
         kind: "interview",
         body: "Samagra Associate process: Deck submission on a governance problem statement → Guesstimate + Governance Case Round (e.g. improving foundational literacy in a state) → Partner chat. Emphasize structured problem-solving and comfort with field travel.",
       });
@@ -800,9 +731,9 @@ async function main() {
     if (prsId) {
       await db.insert(schema.orgNote).values({
         orgId: prsId,
-        userId: "usr_alum_kabir",
-        batch: "MPP 2022–24",
-        anonymous: false,
+        userId: null,
+        batch: "MPP Cohort",
+        anonymous: true,
         kind: "tip",
         body: "For LAMP Fellowship: the two 500-word essays (one policy problem, one book/article critique) carry huge weight. Keep your stance strictly non-partisan and analytical — PRS values neutral briefings that any MP across the aisle can use.",
       });
@@ -818,7 +749,7 @@ async function main() {
         title: g.title,
         category: g.category,
         body: g.body,
-        authorId: "usr_owner_iitd",
+        authorId: "usr_owner_shivang",
       })
       .onConflictDoNothing({ target: schema.resource.slug });
   }

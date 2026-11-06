@@ -193,28 +193,7 @@ function SignInForm() {
             onClick={() => quickPick("ppm254500@iitd.ac.in")}
             className="border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
           >
-            Owner (ppm254500@iitd.ac.in)
-          </button>
-          <button
-            type="button"
-            onClick={() => quickPick("owner@iitd.ac.in")}
-            className="border border-stone-400 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-medium text-stone-800 hover:border-stone-900"
-          >
-            Demo Owner (owner@iitd.ac.in)
-          </button>
-          <button
-            type="button"
-            onClick={() => quickPick("ananya.mpp25@iitd.ac.in")}
-            className="border border-stone-400 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-medium text-stone-800 hover:border-stone-900"
-          >
-            Student Mod (ananya.mpp25@iitd.ac.in)
-          </button>
-          <button
-            type="button"
-            onClick={() => quickPick("rohan.mpp26@iitd.ac.in")}
-            className="border border-stone-400 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-medium text-stone-800 hover:border-stone-900"
-          >
-            1st-Year Student (rohan.mpp26@iitd.ac.in)
+            Shivang Uniyal · Owner (ppm254500@iitd.ac.in)
           </button>
         </div>
 

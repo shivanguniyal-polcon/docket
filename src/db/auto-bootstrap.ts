@@ -271,7 +271,22 @@ async function runBootstrapOnce() {
     const [{ value }] = await db
       .select({ value: count() })
       .from(schema.organization);
-    if (value > 0) return;
+    if (value > 0) {
+      // Ensure fictional demo personas are removed and owner is Shivang Uniyal
+      await db.execute(
+        sql.raw(`
+          DELETE FROM "user" WHERE email IN (
+            'owner@iitd.ac.in',
+            'ananya.mpp25@iitd.ac.in',
+            'rohan.mpp26@iitd.ac.in',
+            'meera.mpp23@iitd.ac.in',
+            'kabir.mpp22@iitd.ac.in'
+          );
+          UPDATE "user" SET name = 'Shivang Uniyal', role = 'owner', batch = 'MPP 2025–27' WHERE email = 'ppm254500@iitd.ac.in';
+        `),
+      );
+      return;
+    }
   } catch {
     // Table does not exist yet -> run DDL
   }
@@ -413,165 +428,82 @@ async function runBootstrapOnce() {
     }
   }
 
-  // Seed default Owner & Cohort personas
-  const personas = [
-    {
-      id: "usr_owner_ganesh",
-      name: "Ganesh Uniyal",
-      email: "ppm254500@iitd.ac.in",
-      role: "owner",
-      batch: "MPP 2025–27",
-      headline:
-        "MPP at IIT Delhi · Permanent Steward of Docket · Tech, AI & Regulatory Policy",
-      sectors: ["tech_ai", "regulation", "government", "health"],
-      skills: [
-        "Policy Analysis",
-        "AI Governance",
-        "R",
-        "Python",
-        "Regulatory Impact Assessment",
-        "Stakeholder Engagement",
-      ],
-      experienceLevel: "0-2",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "SPP, IIT Delhi",
-      currentRole: "MPP Candidate",
-      gradYear: 2027,
-    },
-    {
-      id: "usr_owner_iitd",
-      name: "Docket Owner",
-      email: "owner@iitd.ac.in",
-      role: "owner",
-      batch: "MPP 2025–27",
-      headline: "MPP at IIT Delhi · Permanent Steward of Docket",
-      sectors: ["tech_ai", "regulation", "government"],
-      skills: ["Policy Analysis", "R", "Stata", "Legislative Research"],
-      experienceLevel: "0-2",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "SPP, IIT Delhi",
-      currentRole: "MPP Steward",
-      gradYear: 2027,
-    },
-    {
-      id: "usr_mod_ananya",
-      name: "Ananya Verma",
-      email: "ananya.mpp25@iitd.ac.in",
-      role: "moderator",
-      batch: "MPP 2025–27",
-      headline:
-        "2nd-Year MPP · Climate Finance & Energy Transition · Former Intern @ CEEW",
-      sectors: ["climate", "finance", "government"],
-      skills: ["Stata", "Energy Modelling", "Public Finance", "Policy Briefs"],
-      experienceLevel: "0-2",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "CEEW",
-      currentRole: "Student Moderator",
-      gradYear: 2027,
-    },
-    {
-      id: "usr_stu_rohan",
-      name: "Rohan Nair",
-      email: "rohan.mpp26@iitd.ac.in",
-      role: "member",
-      batch: "MPP 2026–28",
-      headline:
-        "1st-Year MPP seeking Dec 2026 Winter Internship in Health & Development Policy",
-      sectors: ["health", "development", "government"],
-      skills: ["R", "Survey Design", "Qualitative Research"],
-      experienceLevel: "0-2",
-      alumniOptIn: false,
-      openToReferrals: false,
-      currentOrg: "IIT Delhi",
-      currentRole: "1st-Year MPP Student",
-      gradYear: 2028,
-    },
-    {
-      id: "usr_alum_meera",
-      name: "Meera Krishnan",
-      email: "meera.mpp23@iitd.ac.in",
-      role: "alumni",
-      batch: "MPP 2023–25",
-      headline:
-        "MPP Alum · Senior Associate at Samagra Governance · Happy to refer IITD juniors",
-      sectors: ["government", "education", "tech_ai"],
-      skills: ["Governance Consulting", "PMU Delivery", "Data Analytics"],
-      experienceLevel: "3-5",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "Samagra",
-      currentRole: "Senior Associate",
-      gradYear: 2025,
-    },
-    {
-      id: "usr_alum_kabir",
-      name: "Kabir Deshmukh",
-      email: "kabir.mpp22@iitd.ac.in",
-      role: "alumni",
-      batch: "MPP 2022–24",
-      headline:
-        "MPP Alum · Policy Consultant at PwC India (G&PS) · Ex-LAMP Fellow",
-      sectors: ["government", "private_sector", "regulation", "finance"],
-      skills: ["Industrial Policy", "Legislative Research", "Public Procurement"],
-      experienceLevel: "3-5",
-      alumniOptIn: true,
-      openToReferrals: true,
-      currentOrg: "PwC India",
-      currentRole: "Consultant (G&PS)",
-      gradYear: 2024,
-    },
-  ];
+  // Seed only the real Owner (Shivang Uniyal)
+  const owner = {
+    id: "usr_owner_shivang",
+    name: "Shivang Uniyal",
+    email: "ppm254500@iitd.ac.in",
+    role: "owner",
+    batch: "MPP 2025–27",
+    headline:
+      "MPP at IIT Delhi · Permanent Steward of Docket · Tech, AI & Regulatory Policy",
+    sectors: ["tech_ai", "regulation", "government", "health"],
+    skills: [
+      "Policy Analysis",
+      "AI Governance",
+      "R",
+      "Python",
+      "Regulatory Impact Assessment",
+      "Stakeholder Engagement",
+    ],
+    experienceLevel: "0-2",
+    alumniOptIn: true,
+    openToReferrals: true,
+    currentOrg: "SPP, IIT Delhi",
+    currentRole: "MPP Candidate & Portal Owner",
+    gradYear: 2027,
+  };
 
-  for (const p of personas) {
-    await db
-      .insert(schema.user)
-      .values({
-        id: p.id,
-        name: p.name,
-        email: p.email,
-        emailVerified: true,
-        role: p.role,
-        batch: p.batch,
-      })
-      .onConflictDoNothing();
+  await db
+    .insert(schema.user)
+    .values({
+      id: owner.id,
+      name: owner.name,
+      email: owner.email,
+      emailVerified: true,
+      role: owner.role,
+      batch: owner.batch,
+    })
+    .onConflictDoUpdate({
+      target: schema.user.email,
+      set: {
+        name: owner.name,
+        role: owner.role,
+        batch: owner.batch,
+      },
+    });
 
-    await db
-      .insert(schema.userEmail)
-      .values({
-        userId: p.id,
-        email: p.email,
-        kind: "iitd",
-        verifiedAt: new Date(),
-      })
-      .onConflictDoNothing();
+  await db
+    .insert(schema.userEmail)
+    .values({
+      userId: owner.id,
+      email: owner.email,
+      kind: "iitd",
+      verifiedAt: new Date(),
+    })
+    .onConflictDoNothing();
 
-    await db
-      .insert(schema.profile)
-      .values({
-        userId: p.id,
-        headline: p.headline,
-        sectors: p.sectors,
-        skills: p.skills,
-        experienceLevel: p.experienceLevel,
-        alumniOptIn: p.alumniOptIn,
-        openToReferrals: p.openToReferrals,
-        currentOrg: p.currentOrg,
-        currentRole: p.currentRole,
-        gradYear: p.gradYear,
-        resumeText:
-          p.role === "owner"
-            ? "Master of Public Policy (MPP), Indian Institute of Technology Delhi (IIT Delhi). Coursework: Econometrics, Public Policy Analysis, AI & Digital Regulation, Health Systems, Energy & Climate Policy. Skills: R, Python, Stata, Policy Briefs, Regulatory Analysis, Stakeholder Consultations, Impact Evaluation."
-            : null,
-        resumeFileName: p.role === "owner" ? "IITD_MPP_Policy_CV.pdf" : null,
-        resumeUpdatedAt: p.role === "owner" ? new Date() : null,
-      })
-      .onConflictDoNothing();
-  }
+  await db
+    .insert(schema.profile)
+    .values({
+      userId: owner.id,
+      headline: owner.headline,
+      sectors: owner.sectors,
+      skills: owner.skills,
+      experienceLevel: owner.experienceLevel,
+      alumniOptIn: owner.alumniOptIn,
+      openToReferrals: owner.openToReferrals,
+      currentOrg: owner.currentOrg,
+      currentRole: owner.currentRole,
+      gradYear: owner.gradYear,
+      resumeText:
+        "Master of Public Policy (MPP), Indian Institute of Technology Delhi (IIT Delhi). Coursework: Econometrics, Public Policy Analysis, AI & Digital Regulation, Health Systems, Energy & Climate Policy. Skills: R, Python, Stata, Policy Briefs, Regulatory Analysis, Stakeholder Consultations, Impact Evaluation.",
+      resumeFileName: "IITD_MPP_Policy_CV.pdf",
+      resumeUpdatedAt: new Date(),
+    })
+    .onConflictDoNothing();
 
-  // Seed starter career guides & institutional memory notes
+  // Seed starter career guides & anonymous institutional memory notes
   const starterGuides = [
     {
       slug: "indian-policy-cv-playbook",
@@ -630,7 +562,7 @@ State your earliest start window (e.g. "Available for winter internship from Dec
         title: g.title,
         category: g.category,
         body: g.body,
-        authorId: "usr_owner_ganesh",
+        authorId: owner.id,
       })
       .onConflictDoNothing({ target: schema.resource.slug });
   }
@@ -643,9 +575,9 @@ State your earliest start window (e.g. "Available for winter internship from Dec
     await db.insert(schema.orgNote).values([
       {
         orgId: ceewId,
-        userId: "usr_mod_ananya",
-        batch: "MPP 2025–27",
-        anonymous: false,
+        userId: null,
+        batch: "MPP Cohort",
+        anonymous: true,
         kind: "assignment_prompt",
         roleTitle: "Research Analyst — Power & Renewables",
         compensation: "₹9.5–11.5 LPA (Analyst) · ₹20k/mo (Intern)",
@@ -655,8 +587,8 @@ State your earliest start window (e.g. "Available for winter internship from Dec
       },
       {
         orgId: ceewId,
-        userId: "usr_alum_kabir",
-        batch: "MPP 2022–24",
+        userId: null,
+        batch: "MPP Cohort",
         anonymous: true,
         kind: "timeline",
         roleTitle: "Winter / Summer Research Intern",
@@ -664,30 +596,14 @@ State your earliest start window (e.g. "Available for winter internship from Dec
         body: "Winter internship calls usually go out in November; summer internship & Research Analyst calls open in February–March. Applying within the first 7 days of posting significantly helps.",
       },
     ]);
-
-    const statuses = ["offer", "interviewing", "interviewing", "applied", "rejected"];
-    for (let i = 0; i < 5; i++) {
-      await db.insert(schema.application).values({
-        userId: personas[i].id,
-        orgId: ceewId,
-        title: "Research Intern / Analyst — Energy Transition",
-        orgName: "Council on Energy, Environment and Water (CEEW)",
-        url: "https://ceew.zohorecruit.in/jobs/Careers",
-        type: i < 2 ? "internship" : "full_time",
-        status: statuses[i],
-        deadline: "2026-12-05",
-        appliedAt: "2026-11-02",
-        shareOutcome: true,
-      });
-    }
   }
 
   if (samagraId) {
     await db.insert(schema.orgNote).values({
       orgId: samagraId,
-      userId: "usr_alum_meera",
-      batch: "MPP 2023–25",
-      anonymous: false,
+      userId: null,
+      batch: "MPP Cohort",
+      anonymous: true,
       kind: "assignment_prompt",
       roleTitle: "Associate — Governance Consulting",
       compensation: "₹14.5–17.5 LPA",
@@ -700,9 +616,9 @@ State your earliest start window (e.g. "Available for winter internship from Dec
   if (prsId) {
     await db.insert(schema.orgNote).values({
       orgId: prsId,
-      userId: "usr_alum_kabir",
-      batch: "MPP 2022–24",
-      anonymous: false,
+      userId: null,
+      batch: "MPP Cohort",
+      anonymous: true,
       kind: "tip",
       roleTitle: "LAMP Fellow",
       compensation: "₹23,000/month stipend",

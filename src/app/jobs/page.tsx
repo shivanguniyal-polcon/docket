@@ -137,11 +137,14 @@ export default async function JobsPage({
     const targetSectors = Array.from(
       new Set(targetPlaybook.flatMap((o) => o.sectors)),
     );
+    const sectorChecks = targetSectors.map(
+      (s) => sql`${s} = ANY(${schema.job.sectors})`,
+    );
     if (targetOrgNames.length > 0) {
       conditions.push(
         or(
           sql`${schema.job.orgName} = ANY(${targetOrgNames})`,
-          sql`${schema.job.sectors} && ${targetSectors}`,
+          ...sectorChecks,
         )!,
       );
     }

@@ -124,8 +124,10 @@ export default async function JobDetailPage({
           eq(schema.job.status, "published"),
           ne(schema.job.id, jobRow.id),
           or(
-            jobRow.type ? eq(schema.job.type, jobRow.type) : sql`TRUE`,
-            sql`${jobRow.sectors} && ${schema.job.sectors}`,
+            jobRow.type ? eq(schema.job.type, jobRow.type) : undefined,
+            ...(jobRow.sectors || []).map(
+              (s) => sql`${s} = ANY(${schema.job.sectors})`,
+            ),
           ),
         ),
       )

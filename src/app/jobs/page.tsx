@@ -8,7 +8,7 @@ import {
   Users,
   Plus,
 } from "lucide-react";
-import { requireUser } from "@/lib/session";
+import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { and, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import {
@@ -40,7 +40,7 @@ export default async function JobsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const user = await requireUser();
+  const user = await getUser();
   const params = await searchParams;
 
   const q = (params.q ?? "").trim();
@@ -75,14 +75,18 @@ export default async function JobsPage({
       .where(and(...conditions))
       .orderBy(desc(schema.job.postedAt), desc(schema.job.createdAt))
       .limit(120),
-    db
-      .select()
-      .from(schema.application)
-      .where(eq(schema.application.userId, user.id)),
-    db
-      .select()
-      .from(schema.fitScore)
-      .where(eq(schema.fitScore.userId, user.id)),
+    user
+      ? db
+          .select()
+          .from(schema.application)
+          .where(eq(schema.application.userId, user.id))
+      : Promise.resolve([]),
+    user
+      ? db
+          .select()
+          .from(schema.fitScore)
+          .where(eq(schema.fitScore.userId, user.id))
+      : Promise.resolve([]),
     db
       .select({
         userName: schema.user.name,

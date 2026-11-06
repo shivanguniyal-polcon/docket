@@ -46,6 +46,10 @@ export function FitScoreWidget({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId, force }),
       });
+      if (res.status === 401) {
+        window.location.href = "/sign-in";
+        return;
+      }
       if (res.ok) {
         const data = (await res.json()) as FitData;
         setFit(data);
@@ -63,6 +67,10 @@ export function FitScoreWidget({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobId }),
       });
+      if (res.status === 401) {
+        window.location.href = "/sign-in";
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setCoverNote(data);

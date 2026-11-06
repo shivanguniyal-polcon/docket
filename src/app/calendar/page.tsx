@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Calendar as CalendarIcon, Download, ExternalLink, Clock } from "lucide-react";
-import { requireUser } from "@/lib/session";
+import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { asc, eq, isNotNull } from "drizzle-orm";
 import {
@@ -41,14 +41,16 @@ function isMonthInWindow(
 }
 
 export default async function CalendarPage() {
-  const user = await requireUser();
+  const user = await getUser();
 
   const [myApps, jobsWithDeadlines, recurring] = await Promise.all([
-    db
-      .select()
-      .from(schema.application)
-      .where(eq(schema.application.userId, user.id))
-      .orderBy(asc(schema.application.deadline)),
+    user
+      ? db
+          .select()
+          .from(schema.application)
+          .where(eq(schema.application.userId, user.id))
+          .orderBy(asc(schema.application.deadline))
+      : Promise.resolve([]),
     db
       .select()
       .from(schema.job)

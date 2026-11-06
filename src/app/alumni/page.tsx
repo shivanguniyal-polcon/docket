@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Users, Send, ExternalLink, Briefcase } from "lucide-react";
-import { requireUser } from "@/lib/session";
+import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { SECTORS, type Sector } from "@/lib/taxonomy";
 import { requestReferralAction } from "@/app/actions";
 
 export default async function AlumniPage() {
-  const user = await requireUser();
+  const user = await getUser();
 
   const rows = await db
     .select({
@@ -116,7 +116,7 @@ export default async function AlumniPage() {
                   </a>
                 )}
 
-                {profile.openToReferrals && member.id !== user.id && (
+                {profile.openToReferrals && member.id !== user?.id && (
                   <details className="text-xs">
                     <summary className="cursor-pointer rounded-xl bg-stone-900 px-3 py-1.5 text-center font-semibold text-white hover:bg-stone-800">
                       Request referral / coffee chat

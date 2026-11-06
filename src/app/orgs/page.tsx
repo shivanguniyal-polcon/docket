@@ -7,7 +7,7 @@ import {
   Plus,
   Compass,
 } from "lucide-react";
-import { requireUser } from "@/lib/session";
+import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { asc, eq } from "drizzle-orm";
 import {
@@ -40,7 +40,7 @@ export default async function OrgsPage({
     q?: string;
   }>;
 }) {
-  await requireUser();
+  await getUser();
   const params = await searchParams;
   const category = (params.category ?? "").trim();
   const sector = (params.sector ?? "").trim();

@@ -58,38 +58,32 @@ export default async function LandingPage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              {user ? (
-                <>
-                  <Link
-                    href="/jobs"
-                    className="inline-flex items-center gap-2 border border-stone-900 bg-stone-900 px-5 py-2.5 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
-                  >
-                    Enter Mandate Ledger
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href="/resources"
-                    className="inline-flex items-center gap-2 border border-stone-900 bg-transparent px-5 py-2.5 text-xs font-semibold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
-                  >
-                    Read the Career Field Manual
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/sign-in"
-                    className="inline-flex items-center gap-2 border border-stone-900 bg-stone-900 px-5 py-2.5 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
-                  >
-                    Verify with @iitd.ac.in
-                    <ArrowUpRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href="/sign-in"
-                    className="inline-flex items-center gap-2 border border-stone-900 bg-transparent px-4 py-2.5 text-xs font-semibold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
-                  >
-                    Alumni Backup Email Sign-In
-                  </Link>
-                </>
+              <Link
+                href="/jobs"
+                className="inline-flex items-center gap-2 border border-stone-900 bg-stone-900 px-5 py-2.5 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
+              >
+                Browse Live Mandates
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/orgs"
+                className="inline-flex items-center gap-2 border border-stone-900 bg-[#FBF9F4] px-4 py-2.5 text-xs font-semibold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
+              >
+                Where-to-Apply Atlas (58 Orgs)
+              </Link>
+              <Link
+                href="/resources"
+                className="inline-flex items-center gap-2 border border-stone-900 bg-transparent px-4 py-2.5 text-xs font-semibold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
+              >
+                Archetype Matcher &amp; Field Manual
+              </Link>
+              {!user && (
+                <Link
+                  href="/sign-in"
+                  className="inline-flex items-center gap-1.5 px-2 py-2 font-mono-tabular text-xs font-semibold text-amber-900 underline hover:text-stone-950"
+                >
+                  Sign in with @iitd.ac.in to track →
+                </Link>
               )}
             </div>
           </div>
@@ -205,7 +199,7 @@ export default async function LandingPage() {
             § 02 · RECENTLY VERIFIED MANDATES ON THE WIRE
           </h2>
           <Link
-            href={user ? "/jobs" : "/sign-in"}
+            href="/jobs"
             className="font-mono-tabular text-xs font-semibold text-stone-900 hover:underline"
           >
             OPEN FULL LEDGER →
@@ -216,7 +210,7 @@ export default async function LandingPage() {
           {previewJobs.map((j) => (
             <Link
               key={j.id}
-              href={user ? `/jobs/${j.id}` : "/sign-in"}
+              href={`/jobs/${j.id}`}
               className="group grid gap-2 px-4 py-3.5 transition hover:bg-[#EFECE4] sm:grid-cols-12 sm:items-center"
             >
               <div className="sm:col-span-3">

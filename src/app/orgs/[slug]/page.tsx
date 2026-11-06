@@ -9,7 +9,7 @@ import {
   Trash2,
   Lock,
 } from "lucide-react";
-import { requireUser, isModerator } from "@/lib/session";
+import { getUser, isModerator } from "@/lib/session";
 import { db, schema } from "@/db";
 import { and, desc, eq } from "drizzle-orm";
 import {
@@ -28,7 +28,7 @@ export default async function OrgDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const user = await requireUser();
+  const user = await getUser();
   const { slug } = await params;
 
   const [org] = await db
@@ -256,7 +256,7 @@ export default async function OrgDetailPage({
             <label className="flex items-center gap-1.5 text-xs text-stone-700">
               <input type="checkbox" name="anonymous" defaultChecked />
               Post anonymously (shows only your batch year, e.g.{" "}
-              {user.batch ?? "MPP Cohort"})
+              {user?.batch ?? "MPP Cohort"})
             </label>
           </div>
 
@@ -306,8 +306,9 @@ export default async function OrgDetailPage({
 
         <div className="mt-4 space-y-3">
           {notes.map(({ note, authorName }) => {
-            const canDelete =
-              note.userId === user.id || isModerator(user.role);
+            const canDelete = Boolean(
+              user && (note.userId === user.id || isModerator(user.role)),
+            );
             return (
               <div
                 key={note.id}

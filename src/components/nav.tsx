@@ -57,7 +57,7 @@ export function AppNav({
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-7">
             <Link
-              href={user ? "/jobs" : "/"}
+              href="/"
               className="flex items-baseline gap-2"
             >
               <span className="font-serif-editorial text-2xl font-bold tracking-tight text-stone-950">
@@ -68,63 +68,61 @@ export function AppNav({
               </span>
             </Link>
 
-            {user && (
-              <nav className="hidden items-center gap-0.5 lg:flex">
-                {LINKS.map((item) => {
-                  const active =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`px-3 py-1.5 text-xs font-semibold tracking-tight transition ${
-                        active
-                          ? "bg-stone-900 text-[#F6F3EC]"
-                          : "text-stone-700 hover:bg-stone-200/70 hover:text-stone-950"
-                      }`}
-                    >
-                      <span className="font-mono-tabular mr-1 text-[10px] opacity-60">
-                        {item.code}
-                      </span>
-                      {item.label}
-                    </Link>
-                  );
-                })}
-                {isMod && (
+            <nav className="hidden items-center gap-0.5 lg:flex">
+              {LINKS.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`);
+                return (
                   <Link
-                    href="/admin"
+                    key={item.href}
+                    href={item.href}
                     className={`px-3 py-1.5 text-xs font-semibold tracking-tight transition ${
-                      pathname.startsWith("/admin")
-                        ? "bg-amber-900 text-white"
-                        : "text-amber-900 hover:bg-amber-100/70"
+                      active
+                        ? "bg-stone-900 text-[#F6F3EC]"
+                        : "text-stone-700 hover:bg-stone-200/70 hover:text-stone-950"
                     }`}
                   >
-                    <span className="font-mono-tabular mr-1 text-[10px] opacity-70">
-                      07
+                    <span className="font-mono-tabular mr-1 text-[10px] opacity-60">
+                      {item.code}
                     </span>
-                    Desk
-                    {pendingCount > 0 && (
-                      <span className="ml-1.5 bg-amber-900 px-1.5 py-0.5 font-mono-tabular text-[10px] text-white">
-                        {pendingCount}
-                      </span>
-                    )}
+                    {item.label}
                   </Link>
-                )}
-              </nav>
-            )}
+                );
+              })}
+              {isMod && (
+                <Link
+                  href="/admin"
+                  className={`px-3 py-1.5 text-xs font-semibold tracking-tight transition ${
+                    pathname.startsWith("/admin")
+                      ? "bg-amber-900 text-white"
+                      : "text-amber-900 hover:bg-amber-100/70"
+                  }`}
+                >
+                  <span className="font-mono-tabular mr-1 text-[10px] opacity-70">
+                    07
+                  </span>
+                  Desk
+                  {pendingCount > 0 && (
+                    <span className="ml-1.5 bg-amber-900 px-1.5 py-0.5 font-mono-tabular text-[10px] text-white">
+                      {pendingCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+            </nav>
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/submit"
+              className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-3 py-1.5 text-xs font-semibold text-stone-900 transition hover:bg-stone-900 hover:text-[#F6F3EC]"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Log Mandate</span>
+            </Link>
             {user ? (
               <>
-                <Link
-                  href="/submit"
-                  className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-3 py-1.5 text-xs font-semibold text-stone-900 transition hover:bg-stone-900 hover:text-[#F6F3EC]"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Log Mandate</span>
-                </Link>
                 <Link
                   href="/settings"
                   className={`px-2.5 py-1.5 font-mono-tabular text-xs font-medium ${
@@ -149,7 +147,7 @@ export function AppNav({
                 href="/sign-in"
                 className="border border-stone-900 bg-stone-900 px-4 py-1.5 text-xs font-semibold tracking-wide text-[#F6F3EC] uppercase hover:bg-stone-800"
               >
-                Cohort Sign-In →
+                Sign In to Track →
               </Link>
             )}
           </div>
@@ -157,30 +155,28 @@ export function AppNav({
       </header>
 
       {/* Mobile bottom ledger bar */}
-      {user && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-stone-900 bg-[#F6F3EC] py-2 lg:hidden">
-          {LINKS.map((item) => {
-            const active =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center px-2 py-0.5 text-[11px] font-semibold ${
-                  active
-                    ? "bg-stone-900 px-2.5 py-1 text-[#F6F3EC]"
-                    : "text-stone-700"
-                }`}
-              >
-                <span className="font-mono-tabular text-[9px] opacity-60">
-                  {item.code}
-                </span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      )}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-stone-900 bg-[#F6F3EC] py-2 lg:hidden">
+        {LINKS.map((item) => {
+          const active =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center px-2 py-0.5 text-[11px] font-semibold ${
+                active
+                  ? "bg-stone-900 px-2.5 py-1 text-[#F6F3EC]"
+                  : "text-stone-700"
+              }`}
+            >
+              <span className="font-mono-tabular text-[9px] opacity-60">
+                {item.code}
+              </span>
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </>
   );
 }

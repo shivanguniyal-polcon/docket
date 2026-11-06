@@ -12,7 +12,7 @@ import {
   Users,
   Send,
 } from "lucide-react";
-import { requireUser } from "@/lib/session";
+import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { and, desc, eq } from "drizzle-orm";
 import {
@@ -38,7 +38,7 @@ export default async function JobDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = await requireUser();
+  const user = await getUser();
   const { id } = await params;
 
   const [jobRow] = await db
@@ -57,26 +57,30 @@ export default async function JobDetailPage({
           .where(eq(schema.organization.id, jobRow.orgId))
           .limit(1)
       : Promise.resolve([ undefined ]),
-    db
-      .select()
-      .from(schema.application)
-      .where(
-        and(
-          eq(schema.application.userId, user.id),
-          eq(schema.application.jobId, jobRow.id),
-        ),
-      )
-      .limit(1),
-    db
-      .select()
-      .from(schema.fitScore)
-      .where(
-        and(
-          eq(schema.fitScore.userId, user.id),
-          eq(schema.fitScore.jobId, jobRow.id),
-        ),
-      )
-      .limit(1),
+    user
+      ? db
+          .select()
+          .from(schema.application)
+          .where(
+            and(
+              eq(schema.application.userId, user.id),
+              eq(schema.application.jobId, jobRow.id),
+            ),
+          )
+          .limit(1)
+      : Promise.resolve([ undefined ]),
+    user
+      ? db
+          .select()
+          .from(schema.fitScore)
+          .where(
+            and(
+              eq(schema.fitScore.userId, user.id),
+              eq(schema.fitScore.jobId, jobRow.id),
+            ),
+          )
+          .limit(1)
+      : Promise.resolve([ undefined ]),
     jobRow.orgId
       ? db
           .select()
@@ -266,7 +270,7 @@ export default async function JobDetailPage({
                   <div className="mt-0.5 text-[11px] text-stone-600">
                     {profile.currentRole} · {profile.currentOrg}
                   </div>
-                  {profile.openToReferrals && alum.id !== user.id && (
+                  {profile.openToReferrals && alum.id !== user?.id && (
                     <details className="mt-2">
                       <summary className="cursor-pointer text-[11px] font-semibold text-sky-900 hover:underline">
                         Request a referral or 15-min prep chat →

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
-import { and, asc, count, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
 import {
   EXPERIENCE,
   JOB_TYPES,
@@ -143,7 +143,7 @@ export default async function JobsPage({
     if (targetOrgNames.length > 0) {
       conditions.push(
         or(
-          sql`${schema.job.orgName} = ANY(${targetOrgNames})`,
+          inArray(schema.job.orgName, targetOrgNames),
           ...sectorChecks,
         )!,
       );

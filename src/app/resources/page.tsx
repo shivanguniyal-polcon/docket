@@ -109,7 +109,7 @@ export default async function ResourcesPage({
 }: {
   searchParams?: Promise<{ tab?: string }>;
 }) {
-  const params = await (searchParams ?? Promise.resolve({}));
+  const resolvedParams = searchParams ? await searchParams : undefined;
   const user = await getUser();
   const resources = await db
     .select()
@@ -138,7 +138,7 @@ export default async function ResourcesPage({
       {/* Interactive Placement Pathfinder, CV Bullet Translator & 48-Hr Workbench */}
       <PlacementPathfinder
         isSignedIn={Boolean(user)}
-        initialTab={params?.tab}
+        initialTab={resolvedParams?.tab}
       />
 
       {/* Section 1: The 5-Track Industry Standards Matrix */}

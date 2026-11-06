@@ -104,6 +104,14 @@ export const emailToken = pgTable("email_token", {
   expiresAt: timestamp("expires_at").notNull(),
 });
 
+export const devEmail = pgTable("dev_email", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  to: text("to").notNull(),
+  subject: text("subject").notNull(),
+  url: text("url"),
+  sentAt: timestamp("sent_at").notNull().defaultNow(),
+});
+
 export const roleAudit = pgTable("role_audit", {
   id: uuid("id").primaryKey().defaultRandom(),
   actorId: text("actor_id").references(() => user.id, { onDelete: "set null" }),

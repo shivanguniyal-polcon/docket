@@ -47,6 +47,18 @@ const consoleProvider: EmailProvider = {
     });
     globalForEmail.__docketLastEmails = list.slice(0, 10);
 
+    try {
+      const { db, schema } = await import("@/db");
+      await db.insert(schema.devEmail).values({
+        to: toStr,
+        subject: msg.subject,
+        url: urlMatch?.[0] ?? null,
+        sentAt: new Date(),
+      });
+    } catch (e) {
+      console.warn("[email:console] Could not persist to devEmail table:", e);
+    }
+
     console.log(
       `\n📧 [email:console] to=${toStr}\n   subject: ${msg.subject}\n   ${
         msg.text ?? msg.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()

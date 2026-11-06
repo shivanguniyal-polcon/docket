@@ -1,9 +1,10 @@
 /**
  * Email delivery, behind a tiny provider interface.
  *
- * - EMAIL_PROVIDER=resend + RESEND_API_KEY  -> sends through Resend (free tier)
- * - anything else / unset                   -> logs the email to the console
- *   (handy in local dev: magic links show up in the terminal)
+ * - EMAIL_PROVIDER=smtp + SMTP_USER + SMTP_PASS  -> sends through SMTP (e.g. Gmail App Password, 500 emails/day free)
+ * - EMAIL_PROVIDER=resend + RESEND_API_KEY       -> sends through Resend
+ * - anything else / unset                        -> logs the email to the console / devEmail db table
+ *   (handy in local dev: magic links show up in the terminal and on-screen fallback)
  *
  * To switch providers later, add another implementation of EmailProvider.
  */
@@ -93,10 +94,63 @@ function resendProvider(apiKey: string): EmailProvider {
   };
 }
 
+function smtpProvider(user: string, pass: string): EmailProvider {
+  return {
+    name: "smtp",
+    async send(msg) {
+      try {
+        const nodemailer = await import("nodemailer");
+        const host = process.env.SMTP_HOST || "smtp.gmail.com";
+        const port = Number(process.env.SMTP_PORT || 465);
+        const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
+
+        const transporter = nodemailer.createTransport({
+          host,
+          port,
+          secure,
+          auth: {
+            user,
+            pass,
+          },
+        });
+
+        const from =
+          process.env.EMAIL_FROM ||
+          `Docket - MPP <${user}>`;
+
+        await transporter.sendMail({
+          from,
+          to: [msg.to].flat().join(", "),
+          subject: msg.subject,
+          html: msg.html,
+          text: msg.text,
+        });
+        console.log(`[email:smtp] Successfully dispatched email to ${[msg.to].flat().join(", ")} via ${host}`);
+      } catch (error) {
+        console.warn(
+          `[email:smtp] Delivery failed (${error instanceof Error ? error.message : String(error)}). Falling back to in-app stream.`,
+        );
+        await consoleProvider.send(msg);
+      }
+    },
+  };
+}
+
 function getProvider(): EmailProvider {
+  if (
+    process.env.EMAIL_PROVIDER === "smtp" ||
+    (!process.env.EMAIL_PROVIDER && process.env.SMTP_USER && process.env.SMTP_PASS)
+  ) {
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      return smtpProvider(process.env.SMTP_USER, process.env.SMTP_PASS);
+    }
+    console.warn("[email] EMAIL_PROVIDER=smtp specified, but SMTP_USER or SMTP_PASS is missing. Falling back to console.");
+  }
+
   if (process.env.EMAIL_PROVIDER === "resend" && process.env.RESEND_API_KEY) {
     return resendProvider(process.env.RESEND_API_KEY);
   }
+
   return consoleProvider;
 }
 

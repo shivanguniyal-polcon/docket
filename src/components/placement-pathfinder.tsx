@@ -11,6 +11,9 @@ import {
   ExternalLink,
   AlertTriangle,
   Sparkles,
+  CheckCircle2,
+  RotateCcw,
+  FileText,
 } from "lucide-react";
 import {
   BACKGROUND_PROFILES,
@@ -20,6 +23,163 @@ import {
   type BackgroundId,
 } from "@/lib/placement-intelligence";
 import { bulkAddTargetsToTrackerAction } from "@/app/actions";
+
+const SAMPLE_MEMOS: Record<string, string> = {
+  "ceew-energy-transition": `EXECUTIVE SUMMARY (BLUF):
+This policy memo recommends a 3-part regulatory roadmap to operationalize Green Energy Open Access (GEOA) Rules 2022 in state electricity markets without destabilizing state DISCOM balance sheets:
+1. Cross-Subsidy Surcharge (CSS) Trajectory: Cap CSS at 20% of the cost of supply, pegged to SERC Multi-Year Tariff (MYT) orders over a 5-year predictable gliding path.
+2. Time-of-Day (ToD) Energy Banking: Transition from annual energy banking to monthly peak/off-peak settlement to prevent DISCOM revenue leakage during evening peak hours.
+3. Distribution Infrastructure Alignment: Leverage RDSS (Revamped Distribution Sector Scheme) funds to install feeder-level smart meters separating PM-KUSUM agricultural solar feeders from C&I loads.
+
+1. DIAGNOSIS & REGULATORY FRICTION:
+Under the Electricity (Promoting Renewable Energy Through Green Energy Open Access) Rules 2022, the sanctioned load threshold was lowered from 1 MW to 100 kW. However, state SERC tariff orders continue to impose prohibitive wheeling, transmission, and additional surcharges...`,
+
+  "samagra-fln-case": `EXECUTIVE SUMMARY (BLUF):
+To accelerate NIPUN Bharat Grade-3 reading fluency from 34% to 70% across 45,000 primary schools, the State Education Department must shift from passive resource distribution to supportive academic supervision:
+1. Academic Cadence: Institutionalize a mandatory 90-minute daily Teaching-at-the-Right-Level (TaRL) foundational literacy block supported by DIET-validated daily teacher guides.
+2. Governance & Mentoring: Repurpose Block Resource Persons (BRPs) and Cluster Resource Coordinators (CRCs) from administrative compliance to classroom coaching, targeting 15 spot-observations per mentor monthly.
+3. Real-Time Accountability: Deploy a mobile spot-assessment tool linked to a monthly District Magistrate review dashboard tracking UDISE+ and ASER-aligned progress indicators funded via the Samagra Shiksha AWP&B.
+
+1. ROOT-CAUSE DIAGNOSIS:
+Analysis of NAS/PARAKH and state assessment data reveals that instructional time-on-task is severely compromised...`,
+
+  "koan-esya-dpdp": `EXECUTIVE SUMMARY (BLUF):
+This regulatory briefing evaluates compliance bottlenecks between the Digital Personal Data Protection (DPDP) Act, 2023, and indigenous multilingual AI model development under the IndiaAI Mission:
+1. Statutory Safe-Harbor under Section 17(2)(b): Pre-training AI models on publicly available Indian-language web corpora requires explicit research exemptions to prevent retroactive liability under Section 6 notice-and-consent mandates.
+2. Children's Data & Section 9 Friction: Clarify that general web-scale linguistic datasets do not trigger Section 9 verifiable parental consent unless targeted profiling or behavioral monitoring of minors is undertaken.
+3. Enforcement Architecture: Urge the Data Protection Board of India (DPBI) to establish an AI Regulatory Sandbox permitting tokenized data processing with legitimate use exceptions under Section 7.
+
+1. STATUTORY MAPPING & ANALYSIS:
+Section 3(c)(ii) of the DPDP Act provides exemptions for personal data made publicly available by the data principal...`,
+
+  "jpal-idinsight-rct": `TECHNICAL ECONOMETRIC MEMO:
+1. IDENTIFICATION & RANDOMIZATION DESIGN:
+The cluster-randomized evaluation assigned 120 Gram Panchayats (GPs) into treatment (digital credit via SHG federations) and control groups across 4,200 rural households under DAY-NRLM. Because randomization occurred at the Gram Panchayat cluster level, all regression models must estimate standard errors clustered at the GP level: reg outcome treatment, vce(cluster gp_id).
+
+2. DATA CLEANING & BALANCE VERIFICATION:
+- Missingness: Survey missing values coded as -99/999 were verified for differential missingness across treatment arms before imputation.
+- Top-coding: Household monthly consumption expenditure was winsorized at the 99th percentile to prevent high-leverage outliers from distorting mean comparisons.
+- Baseline Balance: Normalized differences and a joint F-test confirmed balance across key demographic covariates.
+
+3. THREATS TO INTERNAL VALIDITY:
+Spillover across adjacent Village Organizations (VOs) could attenuate estimated treatment effects...`,
+
+  "prs-bill-digest": `BRIEFING DIGEST FOR STANDING COMMITTEE:
+REGULATION OF GIG AND PLATFORM WORKERS' SOCIAL SECURITY BILL
+
+EXECUTIVE SUMMARY (BLUF):
+This legislative briefing provides a non-partisan analysis of the proposed Bill establishing a social security fund for platform workers. Key policy decisions before the Committee involve fund financing mechanisms, definition of aggregators, and constitutional competence under the Concurrent List (Entries 23 and 24).
+
+1. CORE PROVISIONS & FINANCING ARCHITECTURE:
+The Bill introduces a 1-2% cess on aggregator transaction turnover to finance health, accident, and pension benefits. Similar to state-level legislation (Rajasthan Platform Based Gig Workers Act, 2023), aggregators must register all active delivery partners on a centralized portal.
+
+2. FOUR CRITICAL QUESTIONS FOR THE COMMITTEE TO RAISE:
+Q1 (Cess Administration): How will transaction cess be separated between platform convenience fees and worker remuneration without reducing net take-home earnings?
+Q2 (Inter-State Portability): How will social security credits transfer when gig workers operate across state boundaries?
+Q3 (Dispute Resolution): Is a three-tier grievance redressal mechanism accessible to workers given informal onboarding?
+Q4 (Data Sharing): Does the aggregator reporting requirement comply with data minimization principles under the DPDP Act, 2023?`,
+};
+
+interface AuditResult {
+  wordCount: number;
+  wordCountPass: boolean;
+  blufPass: boolean;
+  citations: Array<{ name: string; cited: boolean }>;
+  citationsScore: number;
+  risksDetected: string[];
+  score: number;
+  grade: "A" | "B+" | "C";
+  recommendations: string[];
+}
+
+function auditMemo(
+  text: string,
+  blueprint: (typeof ASSIGNMENT_BLUEPRINTS)[0],
+): AuditResult {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  const wordCountPass = wordCount >= 300 && wordCount <= 1600;
+
+  const openingText = words.slice(0, 200).join(" ").toLowerCase();
+  const blufPass =
+    openingText.includes("bluf") ||
+    openingText.includes("executive summary") ||
+    openingText.includes("key takeaways") ||
+    openingText.includes("recommendation") ||
+    openingText.includes("summary:");
+
+  const textLower = text.toLowerCase();
+  const citations = blueprint.indianContextMustCites.map((cite) => {
+    const keywords = cite.match(/\b[A-Za-z0-9&+-]{3,}\b/g) || [cite.slice(0, 10)];
+    const cited = keywords.some(
+      (kw) => kw.length > 2 && textLower.includes(kw.toLowerCase()),
+    );
+    return { name: cite, cited };
+  });
+
+  const citedCount = citations.filter((c) => c.cited).length;
+  const citationsScore = Math.round(
+    (citedCount / Math.max(1, citations.length)) * 100,
+  );
+
+  const risksDetected: string[] = [];
+  const numberCount = (
+    text.match(/(\d+[%₹]?|\bcrore\b|\blakh\b|\bpercent\b)/gi) || []
+  ).length;
+  if (numberCount < 2) {
+    risksDetected.push(
+      "Low quantification: memo has fewer than 2 numbers or percentages. Policy panels eliminate narrative-only submissions.",
+    );
+  }
+
+  const hasTimeline =
+    /\b(month|quarter|phase|timeline|day|pilot|cadence|roadmap)\b/i.test(text);
+  if (!hasTimeline) {
+    risksDetected.push(
+      "Missing operational timeline: no phased rollout, pilot window, or milestone cadence detected.",
+    );
+  }
+
+  let score = 40;
+  if (blufPass) score += 20;
+  if (wordCountPass) score += 15;
+  score += Math.round((citationsScore / 100) * 20);
+  if (numberCount >= 5) score += 5;
+  score -= risksDetected.length * 8;
+  score = Math.max(25, Math.min(98, score));
+
+  const grade: "A" | "B+" | "C" =
+    score >= 80 ? "A" : score >= 60 ? "B+" : "C";
+
+  const recommendations: string[] = [];
+  if (!blufPass) {
+    recommendations.push(
+      "Lead with a 3-bullet Executive Summary / BLUF in the first 150 words before deep-diving into analysis.",
+    );
+  }
+  citations
+    .filter((c) => !c.cited)
+    .forEach((c) => {
+      recommendations.push(
+        `Cite context: "${c.name}" to substantiate institutional fluency.`,
+      );
+    });
+  if (risksDetected.length > 0) {
+    recommendations.push(...risksDetected);
+  }
+
+  return {
+    wordCount,
+    wordCountPass,
+    blufPass,
+    citations,
+    citationsScore,
+    risksDetected,
+    score,
+    grade,
+    recommendations,
+  };
+}
 
 export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
   const [activeTab, setActiveTab] = useState<
@@ -45,6 +205,20 @@ export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>(
     ASSIGNMENT_BLUEPRINTS[0].id,
   );
+  const [memoDraft, setMemoDraft] = useState<string>("");
+  const [auditReport, setAuditReport] = useState<AuditResult | null>(null);
+
+  function handleLoadSampleMemo(bpId = selectedBlueprintId) {
+    const s = SAMPLE_MEMOS[bpId] || "";
+    setMemoDraft(s);
+    setAuditReport(null);
+  }
+
+  function handleRunAudit() {
+    if (!memoDraft.trim()) return;
+    const res = auditMemo(memoDraft, activeBlueprint);
+    setAuditReport(res);
+  }
 
   const profile =
     BACKGROUND_PROFILES.find((p) => p.id === selectedBg) ??
@@ -682,6 +856,185 @@ export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
                 </ul>
               </div>
             </div>
+          </div>
+
+          {/* Interactive Memo Rubric Grader & Compliance Linter */}
+          <div className="border-2 border-stone-900 bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-stone-900 pb-3">
+              <div>
+                <div className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+                  PRACTICE WORKBENCH · ZERO LOGIN REQUIRED
+                </div>
+                <h3 className="font-serif-editorial text-lg text-stone-950">
+                  Interactive Memo Rubric Grader &amp; Compliance Linter
+                </h3>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleLoadSampleMemo(selectedBlueprintId)}
+                  className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
+                >
+                  <FileText className="h-3 w-3" />
+                  Load Sample Winning Memo
+                </button>
+                {memoDraft && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMemoDraft("");
+                      setAuditReport(null);
+                    }}
+                    className="border border-stone-300 px-2 py-1 font-mono-tabular text-[10px] text-stone-600 hover:border-stone-900"
+                  >
+                    Clear [×]
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <label className="font-mono-tabular flex items-center justify-between text-[10px] font-bold text-stone-700 uppercase">
+                <span>Paste Your Draft Assignment Memo (or edit loaded sample)</span>
+                <span>
+                  Words: {memoDraft.trim().split(/\s+/).filter(Boolean).length}
+                </span>
+              </label>
+              <textarea
+                rows={6}
+                value={memoDraft}
+                onChange={(e) => setMemoDraft(e.target.value)}
+                placeholder="Paste your executive summary, statutory citations, methodology, and recommendations here to audit before submitting to the employer..."
+                className="mt-1 w-full border border-stone-900 p-3 text-xs leading-relaxed text-stone-900 focus:outline-none"
+              />
+            </div>
+
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[11px] text-stone-500">
+                Audits BLUF placement, must-cite policies/datasets, and elimination traps.
+              </span>
+              <button
+                type="button"
+                onClick={handleRunAudit}
+                disabled={!memoDraft.trim()}
+                className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-bold text-[#FBF9F4] uppercase hover:bg-stone-800 disabled:opacity-50"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                Audit Memo Against Rubric
+              </button>
+            </div>
+
+            {/* Audit Report */}
+            {auditReport && (
+              <div className="mt-4 border-t-2 border-stone-900 pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border border-stone-900 bg-[#EFECE3] p-3">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`border px-2.5 py-1 font-mono-tabular text-sm font-bold uppercase ${
+                        auditReport.grade === "A"
+                          ? "border-emerald-800 bg-emerald-100 text-emerald-950"
+                          : auditReport.grade === "B+"
+                            ? "border-amber-700 bg-amber-100 text-amber-950"
+                            : "border-red-700 bg-red-100 text-red-950"
+                      }`}
+                    >
+                      GRADE {auditReport.grade} · {auditReport.score}/100
+                    </span>
+                    <span className="font-serif-editorial text-sm font-normal text-stone-950">
+                      {auditReport.grade === "A"
+                        ? "Interview-Ready Submission — Strong structure and evidence grounding."
+                        : auditReport.grade === "B+"
+                          ? "Solid Draft — Address the minor omissions below before submission."
+                          : "Needs Re-work — Review the elimination flags below to protect your round 1."}
+                    </span>
+                  </div>
+                  <span className="font-mono-tabular text-[10px] text-stone-600">
+                    Word Count: {auditReport.wordCount}
+                  </span>
+                </div>
+
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="border border-stone-300 bg-[#FBF9F4] p-3 text-xs">
+                    <div className="font-mono-tabular flex items-center justify-between border-b border-stone-200 pb-1.5 text-[10px] font-bold text-stone-900 uppercase">
+                      <span>Mandatory Indian Context Citations</span>
+                      <span className="text-stone-600">
+                        {auditReport.citationsScore}% Match
+                      </span>
+                    </div>
+                    <ul className="mt-2 space-y-1">
+                      {auditReport.citations.map((c, i) => (
+                        <li
+                          key={i}
+                          className={`flex items-center gap-1.5 ${
+                            c.cited
+                              ? "font-semibold text-emerald-900"
+                              : "text-amber-800"
+                          }`}
+                        >
+                          {c.cited ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+                          ) : (
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+                          )}
+                          <span className="line-clamp-1">{c.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="border border-stone-300 bg-[#FBF9F4] p-3 text-xs">
+                    <div className="font-mono-tabular border-b border-stone-200 pb-1.5 text-[10px] font-bold text-stone-900 uppercase">
+                      Structural &amp; Quality Checklist
+                    </div>
+                    <ul className="mt-2 space-y-1.5 text-stone-800">
+                      <li className="flex items-center gap-1.5">
+                        {auditReport.blufPass ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="h-3.5 w-3.5 text-red-700 shrink-0" />
+                        )}
+                        <span>
+                          {auditReport.blufPass
+                            ? "BLUF / Executive Summary in first 200 words (Pass)"
+                            : "No Executive Summary / BLUF in opening (Elimination Risk)"}
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        {auditReport.wordCountPass ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+                        ) : (
+                          <AlertTriangle className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+                        )}
+                        <span>
+                          {auditReport.wordCountPass
+                            ? "Word count in acceptable range (300–1,600 words)"
+                            : "Word count outside optimal assignment range"}
+                        </span>
+                      </li>
+                      {auditReport.risksDetected.map((risk, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-red-900 font-medium">
+                          <AlertTriangle className="h-3.5 w-3.5 text-red-700 shrink-0 mt-0.5" />
+                          <span>{risk}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {auditReport.recommendations.length > 0 && (
+                  <div className="mt-3 border border-amber-900/30 bg-amber-50/50 p-3 text-xs">
+                    <div className="font-mono-tabular text-[10px] font-bold text-amber-950 uppercase">
+                      Actionable Polish List Before You Submit:
+                    </div>
+                    <ul className="mt-1.5 space-y-1 text-stone-800">
+                      {auditReport.recommendations.map((rec, i) => (
+                        <li key={i}>• {rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -36,6 +36,7 @@ import {
   reportClosedJobAction,
 } from "@/app/actions";
 import { FitScoreWidget } from "@/components/fit-score-widget";
+import { ORG_HIRING_PLAYBOOK } from "@/lib/placement-intelligence";
 
 export default async function JobDetailPage({
   params,
@@ -273,6 +274,17 @@ export default async function JobDetailPage({
               WhatsApp
             </a>
 
+            <a
+              href={`https://www.google.com/search?q=site:linkedin.com/in+${encodeURIComponent(`"${jobRow.orgName}" ("Director" OR "Lead" OR "Partner" OR "Fellow" OR "Programme Lead" OR "HR") "IIT Delhi"`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50"
+              title="Find IIT Delhi seniors and hiring leads on LinkedIn"
+            >
+              Leads on LinkedIn
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+
             <form action={reportClosedJobAction}>
               <input type="hidden" name="jobId" value={jobRow.id} />
               <button
@@ -305,6 +317,37 @@ export default async function JobDetailPage({
             }
           />
         </div>
+
+        {/* Employer Hiring Playbook Callout */}
+        {(() => {
+          const playbook =
+            (org?.slug ? ORG_HIRING_PLAYBOOK[org.slug] : undefined) ??
+            Object.values(ORG_HIRING_PLAYBOOK).find(
+              (p) =>
+                p.name.toLowerCase().includes(jobRow.orgName.toLowerCase()) ||
+                jobRow.orgName.toLowerCase().includes(p.name.toLowerCase()),
+            );
+          if (!playbook) return null;
+          return (
+            <div className="mt-4 border border-stone-300 bg-[#EFECE3] p-4 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-300 pb-2">
+                <span className="font-mono-tabular font-bold text-stone-900 uppercase">
+                  Institutional Playbook · {playbook.hiringChannel}
+                </span>
+                <span className="border border-stone-900 bg-stone-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
+                  {playbook.tier.toUpperCase()} TARGET
+                </span>
+              </div>
+              <div className="mt-2 text-stone-800 leading-relaxed">
+                <strong>Hiring Advice:</strong>{" "}
+                {playbook.howToApplyWhenZeroListed}
+              </div>
+              <div className="mt-2 font-mono-tabular text-[11px] text-stone-600">
+                Typical Entry Roles: {playbook.entryRoles}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Inline IITD MPP Alumni & Seniors at this Organization */}
         {matchingAlumni.length > 0 && (

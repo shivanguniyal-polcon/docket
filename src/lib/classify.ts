@@ -57,10 +57,46 @@ export function classifyJobType(title: string, description = ""): JobType {
 }
 
 export function classifyExperience(title: string, description = ""): Experience {
+  const t = title.toLowerCase();
   const combined = `${title} ${description.slice(0, 800)}`;
 
-  // Explicit years patterns e.g. "3-5 years", "5+ years", "10 years"
-  const rangeMatch = combined.match(/(\d{1,2})\s*(?:[-–to]+)\s*(\d{1,2})\s*\+?\s*(?:years|yrs)/i);
+  // 1. High-certainty title checks (senior leadership, directors, and leads)
+  if (
+    /\b(director|vice president|\bvp\b|partner|head of|chief|principal|team leader|advisor|senior economist|senior policy analyst|practice head)\b/i.test(
+      t,
+    )
+  ) {
+    return "10+";
+  }
+
+  if (
+    /\b(senior manager|senior fellow|program manager|project manager|engagement manager|deputy director|specialist|senior associate|senior research associate|senior analyst)\b/i.test(
+      t,
+    )
+  ) {
+    return "5-10";
+  }
+
+  if (
+    /\b(manager|consultant|associate consultant|policy officer|research fellow)\b/i.test(
+      t,
+    )
+  ) {
+    return "3-5";
+  }
+
+  if (
+    /\b(intern|internship|trainee|fellow|fellowship|young professional|\bra\b|research assistant|junior analyst|junior consultant)\b/i.test(
+      t,
+    )
+  ) {
+    return "0-2";
+  }
+
+  // 2. Explicit years in text e.g. "3-5 years", "5+ years", "10 years"
+  const rangeMatch = combined.match(
+    /(\d{1,2})\s*(?:[-–to]+)\s*(\d{1,2})\s*\+?\s*(?:years|yrs)/i,
+  );
   if (rangeMatch) {
     const min = parseInt(rangeMatch[1], 10);
     if (min >= 10) return "10+";
@@ -69,7 +105,9 @@ export function classifyExperience(title: string, description = ""): Experience 
     return "0-2";
   }
 
-  const plusMatch = combined.match(/(\d{1,2})\s*\+?\s*(?:years|yrs)\s+of\s+experience/i);
+  const plusMatch = combined.match(
+    /(\d{1,2})\s*\+?\s*(?:years|yrs)\s+of\s+experience/i,
+  );
   if (plusMatch) {
     const yrs = parseInt(plusMatch[1], 10);
     if (yrs >= 10) return "10+";
@@ -78,15 +116,6 @@ export function classifyExperience(title: string, description = ""): Experience 
     return "0-2";
   }
 
-  if (/\b(director|vice president|\bvp\b|partner|head of|chief|principal|lead)\b/i.test(title)) {
-    return "10+";
-  }
-  if (/\b(senior manager|senior fellow|program manager|engagement manager|deputy director|specialist)\b/i.test(title)) {
-    return "5-10";
-  }
-  if (/\b(senior associate|senior analyst|manager|consultant|policy officer|research fellow)\b/i.test(title)) {
-    return "3-5";
-  }
   return "0-2";
 }
 

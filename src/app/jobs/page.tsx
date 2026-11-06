@@ -21,6 +21,7 @@ import {
   SECTORS,
   APPLICATION_STATUS_LABELS,
   label,
+  getEstimatedCompensation,
   type Sector,
   type ApplicationStatus,
 } from "@/lib/taxonomy";
@@ -44,6 +45,7 @@ interface SearchParams {
   reported?: string;
   view?: string; // "student" (default) or "all"
   fresh?: string; // "true"
+  paid?: string; // "true"
   archetype?: string; // BackgroundId
 }
 
@@ -91,6 +93,7 @@ export default async function JobsPage({
   const orgId = (params.org ?? "").trim();
   const view = (params.view ?? "").trim();
   const fresh = params.fresh === "true";
+  const paid = params.paid === "true";
   const archetypeId = (params.archetype ?? "").trim() as BackgroundId;
 
   const isStudentMode =
@@ -128,6 +131,36 @@ export default async function JobsPage({
   }
   if (fresh) {
     conditions.push(sql`${schema.job.postedAt} >= NOW() - INTERVAL '7 days'`);
+  }
+  if (paid) {
+    conditions.push(
+      or(
+        ilike(schema.job.orgName, "%niti%"),
+        ilike(schema.job.orgName, "%competition commission%"),
+        ilike(schema.job.orgName, "%cci%"),
+        ilike(schema.job.orgName, "%dpiit%"),
+        ilike(schema.job.orgName, "%external affairs%"),
+        ilike(schema.job.orgName, "%mea%"),
+        ilike(schema.job.orgName, "%prs%"),
+        ilike(schema.job.orgName, "%ceew%"),
+        ilike(schema.job.orgName, "%samagra%"),
+        ilike(schema.job.orgName, "%j-pal%"),
+        ilike(schema.job.orgName, "%poverty action%"),
+        ilike(schema.job.orgName, "%idinsight%"),
+        ilike(schema.job.orgName, "%sattva%"),
+        ilike(schema.job.orgName, "%central square%"),
+        ilike(schema.job.orgName, "%swaniti%"),
+        ilike(schema.job.orgName, "%asian development%"),
+        ilike(schema.job.orgName, "%adb%"),
+        ilike(schema.job.orgName, "%world health%"),
+        ilike(schema.job.orgName, "%who%"),
+        ilike(schema.job.orgName, "%world bank%"),
+        ilike(schema.job.orgName, "%icrier%"),
+        ilike(schema.job.orgName, "%csep%"),
+        ilike(schema.job.orgName, "%nipfp%"),
+        ilike(schema.job.orgName, "%vidhi%"),
+      )!,
+    );
   }
   if (activeArchetype) {
     const targetPlaybook = Object.values(ORG_HIRING_PLAYBOOK).filter((o) =>
@@ -537,6 +570,7 @@ export default async function JobsPage({
             {[
               { href: "/jobs?type=internship", label: "DEC 2026+ INTERNSHIPS" },
               { href: "/jobs?experience=0-2", label: "0–2 YRS (MAY 2027 GRADS)" },
+              { href: "/jobs?paid=true", label: "💰 STIPEND / PAY KNOWN" },
               { href: "/jobs?fresh=true", label: "⚡ FRESH (< 7 DAYS)" },
               { href: "/jobs?archetype=upsc_humanities", label: "🎯 UPSC/HUMANITIES" },
               { href: "/jobs?archetype=stem_btech", label: "⚡ B.TECH / STEM" },
@@ -601,6 +635,8 @@ export default async function JobsPage({
             const fit = fitByJobId.get(j.id);
             const alumniCount = countAlumniForOrg(j.orgName);
             const compInfo = j.orgId ? compByOrgId.get(j.orgId) : undefined;
+            const estimatedComp = getEstimatedCompensation(j.orgName, j.title);
+            const displayComp = compInfo || estimatedComp;
 
             return (
               <div
@@ -616,9 +652,9 @@ export default async function JobsPage({
                     {j.location ?? label(LOCATION_TYPES, j.locationType)}
                     {j.deadline ? ` · DUE ${j.deadline}` : ""}
                   </div>
-                  {compInfo && (
+                  {displayComp && (
                     <div className="inline-block border border-emerald-800 bg-emerald-950/10 px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-emerald-950">
-                      PAY: {compInfo}
+                      PAY: {displayComp}
                     </div>
                   )}
                   {alumniCount > 0 && (

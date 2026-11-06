@@ -224,7 +224,7 @@ export const ORG_HIRING_PLAYBOOK: Record<string, OrgHiringMeta> = {
       "Associate (Governance Consulting) · Applied Public Policy Lab Analyst",
     lateralRoles: "Senior Associate · Consultant · Engagement Manager",
     howToApplyWhenZeroListed:
-      "Samagra runs structured recruitment drives; always reach out to IITD MPP alumni at Samagra (e.g. Meera K.) for an internal referral before submitting on their portal.",
+      "Samagra runs structured recruitment drives; reach out to IIT Delhi MPP seniors and consultants on LinkedIn for an internal referral before submitting on their portal.",
     applyUrl: "https://samagragovernance.in/",
   },
   "jpal-south-asia": {

@@ -281,16 +281,30 @@ export function getAIProvider(): AIProvider {
   return keywordProvider;
 }
 
+export type OutreachFormat =
+  | "linkedin"
+  | "email"
+  | "gap_cover_note"
+  | "follow_up";
+
 /**
- * Generates a tailored 180-word cover note / cold email for a policy role.
- * Uses Gemini if configured, or a crisp, structured template grounded in the
- * candidate's IITD MPP profile and the job's sectors/skills.
+ * Generates tailored outreach for a policy role across 4 practical formats:
+ * - "linkedin": 60-word connection/DM pitch for alumni & practice leads
+ * - "email": 180-word cold application pitch
+ * - "gap_cover_note": 250-word cover note explicitly bridging transition gaps
+ * - "follow_up": 75-word polite status check 10 days post-submission
  */
 export async function draftCoverNote(
   userName: string,
   batch: string | null,
   input: FitInput,
-): Promise<{ subject: string; body: string; provider: string }> {
+  outreachType: OutreachFormat = "email",
+): Promise<{
+  subject: string;
+  body: string;
+  provider: string;
+  outreachType: OutreachFormat;
+}> {
   const geminiKey =
     process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (
@@ -302,15 +316,29 @@ export async function draftCoverNote(
       const { generateText } = await import("ai");
       const google = createGoogleGenerativeAI({ apiKey: geminiKey });
       const modelId = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
-      const { text } = await generateText({
-        model: google(modelId),
-        prompt: `Write a concise, non-fluffy 180-word cover note / cold outreach email from ${userName} (${batch ?? "Master of Public Policy candidate, IIT Delhi"}) applying for "${input.job.title}" at ${input.job.orgName}.
+
+      let formatPrompt = "";
+      if (outreachType === "linkedin") {
+        formatPrompt = `Write a razor-sharp, respectful 60-word LinkedIn direct message from ${userName} (${batch ?? "IIT Delhi MPP"}) to a team leader or alum at ${input.job.orgName} expressing interest in the "${input.job.title}" mandate. No generic flattery, focus on skills and relevant domain match.`;
+      } else if (outreachType === "gap_cover_note") {
+        formatPrompt = `Write a persuasive 250-word cover letter note from ${userName} (${batch ?? "IIT Delhi MPP"}) applying for "${input.job.title}" at ${input.job.orgName}. Address how their interdisciplinary policy training at IIT Delhi quickly bridges any domain or technical gaps and positions them for fast delivery.`;
+      } else if (outreachType === "follow_up") {
+        formatPrompt = `Write a polite, high-professionalism 75-word follow-up check email from ${userName} (${batch ?? "IIT Delhi MPP"}) regarding their previously submitted application for "${input.job.title}" at ${input.job.orgName}. Mention an offer to share an updated policy memo.`;
+      } else {
+        formatPrompt = `Write a concise, non-fluffy 180-word cover note / cold outreach email from ${userName} (${batch ?? "Master of Public Policy candidate, IIT Delhi"}) applying for "${input.job.title}" at ${input.job.orgName}.`;
+      }
+
+      const prompt = `${formatPrompt}
 Candidate headline: ${input.profile.headline ?? "MPP at IIT Delhi"}
 Candidate skills: ${(input.profile.skills ?? []).join(", ")}
 Candidate resume excerpt: ${(input.profile.resumeText ?? "").slice(0, 1500)}
 Job description excerpt: ${(input.job.description ?? "").slice(0, 1500)}
 
-Return ONLY plain text starting with "Subject: ..." on line 1, followed by a blank line and a 3-paragraph email body.`,
+Return ONLY plain text starting with "Subject: ..." on line 1, followed by a blank line and the message body.`;
+
+      const { text } = await generateText({
+        model: google(modelId),
+        prompt,
       });
       const lines = text.trim().split(/\r?\n/);
       const subjectLine = lines[0]?.replace(/^Subject:\s*/i, "").trim();
@@ -320,9 +348,10 @@ Return ONLY plain text starting with "Subject: ..." on line 1, followed by a bla
           `Application: ${input.job.title} — ${userName} (IIT Delhi MPP)`,
         body: lines.slice(1).join("\n").trim(),
         provider: "gemini",
+        outreachType,
       };
     } catch {
-      // fall through to deterministic drafter
+      // fall through to deterministic template drafter
     }
   }
 
@@ -335,8 +364,58 @@ Return ONLY plain text starting with "Subject: ..." on line 1, followed by a bla
     "quantitative policy analysis, regulatory research, and stakeholder synthesis";
   const headline =
     input.profile.headline ||
-    "a Master of Public Policy (MPP) candidate at the Indian Institute of Technology Delhi (IIT Delhi)";
+    "a Master of Public Policy (MPP) candidate at IIT Delhi";
 
+  if (outreachType === "linkedin") {
+    const subject = `IIT Delhi MPP — ${input.job.title} at ${input.job.orgName}`;
+    const body = `Hi [Hiring Lead / Senior],
+
+I hope you're doing well. I'm ${userName} (${batch ?? "IIT Delhi MPP"}), ${headline.toLowerCase().includes("mpp") ? headline : `specializing in ${headline}`}.
+
+I've been closely following ${input.job.orgName}'s work in ${sectorNames || "public policy"} and saw the opening for ${input.job.title}. With hands-on coursework in ${skillList}, I would love to connect and share a 2-page research sample or memo relevant to your current projects.
+
+Would you be open to connecting?
+
+Best regards,
+${userName}`;
+    return { subject, body, provider: "template", outreachType };
+  }
+
+  if (outreachType === "gap_cover_note") {
+    const subject = `Cover Note: ${input.job.title} — ${userName} (IIT Delhi MPP)`;
+    const body = `Dear Hiring Committee at ${input.job.orgName},
+
+I am writing to submit my candidature for the ${input.job.title} mandate. As an MPP candidate at the Indian Institute of Technology Delhi (${batch ?? "IIT Delhi"}), my training is explicitly designed for fast-ramp problem solving across India's complex policy and governance landscape.
+
+While my primary background spans ${headline}, the rigorous policy methods curriculum at IIT Delhi has equipped me with practical fluency in ${skillList}. Rather than approaching this role purely through theoretical frameworks, I am trained to combine statutory analysis, econometric evidence, and ground-level stakeholder constraints.
+
+${input.job.orgName}'s leadership in ${sectorNames || "this sector"} requires analysts who can distill ambiguity into decision-grade memos under tight deadlines. I have attached my CV along with a structured policy brief demonstrating my analytical writing and data synthesis.
+
+I would welcome the opportunity to complete your 48-hour case assignment or speak with the team.
+
+Warm regards,
+${userName}
+Master of Public Policy (MPP), IIT Delhi`;
+    return { subject, body, provider: "template", outreachType };
+  }
+
+  if (outreachType === "follow_up") {
+    const subject = `Status Check: Application for ${input.job.title} — ${userName} (IIT Delhi MPP)`;
+    const body = `Dear Hiring Team at ${input.job.orgName},
+
+I hope this note finds you well. I am following up on my application submitted for the ${input.job.title} position.
+
+I remain deeply keen to contribute to ${input.job.orgName}'s mandates in ${sectorNames || "policy advisory"}. In the interim, I have been working on an applied memo evaluating recent statutory and regulatory developments in this domain, which I would be delighted to share if helpful to the evaluation panel.
+
+Please let me know if any additional academic references or writing samples are needed from my end.
+
+Sincerely,
+${userName}
+Master of Public Policy, IIT Delhi`;
+    return { subject, body, provider: "template", outreachType };
+  }
+
+  // Default: "email"
   const subject = `Application for ${input.job.title} — ${userName} (IIT Delhi MPP)`;
   const body = `Dear Hiring Team at ${input.job.orgName},
 
@@ -350,5 +429,5 @@ Warm regards,
 ${userName}
 Master of Public Policy (MPP), IIT Delhi`;
 
-  return { subject, body, provider: "template" };
+  return { subject, body, provider: "template", outreachType };
 }

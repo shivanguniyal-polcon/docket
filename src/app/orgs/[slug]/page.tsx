@@ -21,6 +21,10 @@ import {
   label,
   type Sector,
 } from "@/lib/taxonomy";
+import {
+  ORG_HIRING_PLAYBOOK,
+  ASSIGNMENT_BLUEPRINTS,
+} from "@/lib/placement-intelligence";
 import { addOrgNoteAction, deleteOrgNoteAction } from "@/app/actions";
 
 export default async function OrgDetailPage({
@@ -159,6 +163,155 @@ export default async function OrgDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Employer Hiring Playbook & Off-Cycle Tactical Guide */}
+      {(() => {
+        const playbook =
+          ORG_HIRING_PLAYBOOK[org.slug] ??
+          Object.values(ORG_HIRING_PLAYBOOK).find(
+            (p) =>
+              p.name.toLowerCase().includes(org.name.toLowerCase()) ||
+              org.name.toLowerCase().includes(p.name.toLowerCase()),
+          );
+
+        const matchingBlueprint = ASSIGNMENT_BLUEPRINTS.find(
+          (b) =>
+            (playbook &&
+              b.targetOrgs.toLowerCase().includes(playbook.name.toLowerCase())) ||
+            b.targetOrgs.toLowerCase().includes(org.name.toLowerCase()) ||
+            (org.sectors &&
+              b.sector.toLowerCase().includes(org.sectors[0]?.toLowerCase())),
+        );
+
+        return (
+          <div className="border-2 border-stone-900 bg-[#FBF9F4] p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-stone-900 pb-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="bg-stone-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
+                  {playbook?.tier
+                    ? `${playbook.tier.toUpperCase()} TIER TARGET`
+                    : "INSTITUTION PLAYBOOK"}
+                </span>
+                <h2 className="font-serif-editorial text-xl font-normal text-stone-950">
+                  Hiring Channels, Decision-Makers &amp; Off-Cycle Strategy
+                </h2>
+              </div>
+              {playbook && (
+                <span className="border border-amber-900 bg-amber-50 px-2.5 py-1 font-mono-tabular text-[11px] font-bold text-amber-950 uppercase">
+                  Channel: {playbook.hiringChannel}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-6 lg:grid-cols-12">
+              <div className="space-y-4 lg:col-span-7">
+                {playbook ? (
+                  <>
+                    <div className="space-y-2">
+                      <div className="font-mono-tabular text-[10px] font-bold text-stone-700 uppercase">
+                        Standard Entry &amp; Lateral Roles at {org.name}
+                      </div>
+                      <div className="border border-stone-300 bg-white p-3 text-xs">
+                        <div>
+                          <span className="font-bold text-stone-900">
+                            Student Entry / Fellowships:
+                          </span>{" "}
+                          <span className="text-stone-700">
+                            {playbook.entryRoles}
+                          </span>
+                        </div>
+                        <div className="mt-2 border-t border-stone-200 pt-2">
+                          <span className="font-bold text-stone-900">
+                            Lateral Roles:
+                          </span>{" "}
+                          <span className="text-stone-700">
+                            {playbook.lateralRoles}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-l-4 border-amber-900 bg-amber-50/70 p-3.5">
+                      <div className="font-mono-tabular text-[10px] font-bold text-amber-950 uppercase">
+                        Tactical Strategy (How to Apply When 0 Jobs Are Listed)
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-stone-800">
+                        {playbook.howToApplyWhenZeroListed}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="border border-stone-300 bg-white p-4 text-xs text-stone-700">
+                    <p className="font-bold text-stone-900">
+                      Off-Cycle Outreach Guidance for {org.name}:
+                    </p>
+                    <p className="mt-1 leading-relaxed">
+                      Most policy organizations hire directly for client grants
+                      rather than running scheduled mass drives. Reaching out
+                      directly to Practice Leads, Program Managers, or IIT Delhi
+                      alumni with a 2-page brief yields significantly higher
+                      response rates than generic inbox submissions.
+                    </p>
+                  </div>
+                )}
+
+                {matchingBlueprint && (
+                  <div className="border border-stone-300 bg-[#EFECE3] p-3.5">
+                    <div className="font-mono-tabular text-[10px] font-bold text-stone-900 uppercase">
+                      Recommended Round-1 Case Memo Blueprint
+                    </div>
+                    <div className="mt-1 text-xs font-bold text-stone-950">
+                      {matchingBlueprint.title} ({matchingBlueprint.timeLimit})
+                    </div>
+                    <p className="mt-1 text-[11px] text-stone-700">
+                      Deliverable: {matchingBlueprint.deliverable}
+                    </p>
+                    <Link
+                      href="/resources"
+                      className="mt-2 inline-flex items-center gap-1 font-mono-tabular text-[11px] font-bold text-stone-950 underline uppercase"
+                    >
+                      Open 48-Hour Assignment Blueprint →
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 lg:col-span-5">
+                <div className="border border-stone-900 bg-white p-4">
+                  <div className="font-mono-tabular text-[10px] font-bold text-stone-900 uppercase">
+                    1-Click Decision-Maker &amp; Senior Search
+                  </div>
+                  <p className="mt-1 text-xs text-stone-600">
+                    Target the leaders staffing projects for {org.name} on LinkedIn:
+                  </p>
+
+                  <div className="mt-3 space-y-2">
+                    <a
+                      href={`https://www.google.com/search?q=site:linkedin.com/in+${encodeURIComponent(`"${org.name}" ("Director" OR "Lead" OR "Partner" OR "Fellow" OR "Programme Lead" OR "HR") "IIT Delhi"`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between border border-stone-900 bg-[#FBF9F4] px-3 py-2 text-xs font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
+                    >
+                      <span>Search IIT Delhi Seniors at {org.name.slice(0, 18)}…</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+
+                    <a
+                      href={`https://www.google.com/search?q=site:linkedin.com/in+${encodeURIComponent(`"${org.name}" ("Programme Lead" OR "Practice Head" OR "Director" OR "Research Director" OR "Founding Partner")`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between border border-stone-400 bg-white px-3 py-2 text-xs font-semibold text-stone-800 hover:border-stone-900"
+                    >
+                      <span>Find Vertical Heads &amp; Leads</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Anonymous Cohort Outcome Stats (k >= 5) */}
       <div className="rounded-2xl border border-stone-200 bg-white p-6">

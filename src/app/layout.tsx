@@ -81,7 +81,7 @@ export default async function RootLayout({
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 pb-24 sm:px-6 md:pb-14">
           {children}
         </main>
-        <footer className="border-t-2 border-stone-900 bg-[#EFECE4] py-6 text-xs text-stone-700">
+        <footer className="border-t-2 border-stone-900 bg-[#EFECE4] pt-6 pb-20 text-xs text-stone-700 lg:pb-6">
           <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-4 sm:flex-row sm:items-center sm:px-6">
             <div className="space-y-0.5">
               <div className="font-mono-tabular text-[11px] font-semibold tracking-wider text-stone-900 uppercase">

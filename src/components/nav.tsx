@@ -159,9 +159,10 @@ export function AppNav({
             ) : (
               <Link
                 href="/sign-in"
-                className="border border-stone-900 bg-stone-900 px-4 py-1.5 text-xs font-semibold tracking-wide text-[#F6F3EC] uppercase hover:bg-stone-800"
+                className="border border-stone-900 bg-stone-900 px-2.5 py-1.5 text-xs font-semibold tracking-wide text-[#F6F3EC] uppercase hover:bg-stone-800 sm:px-4"
               >
-                Sign In to Track →
+                <span className="hidden sm:inline">Sign In to Track →</span>
+                <span className="sm:hidden">Sign In →</span>
               </Link>
             )}
           </div>
@@ -169,7 +170,7 @@ export function AppNav({
       </header>
 
       {/* Mobile bottom ledger bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t-2 border-stone-900 bg-[#F6F3EC] py-2 lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t-2 border-stone-900 bg-[#F6F3EC] px-1 py-1 lg:hidden">
         {LINKS.map((item) => {
           const active =
             pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -177,19 +178,36 @@ export function AppNav({
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center px-2 py-0.5 text-[11px] font-semibold ${
+              className={`flex flex-1 flex-col items-center justify-center rounded-none px-1 py-1 transition ${
                 active
-                  ? "bg-stone-900 px-2.5 py-1 text-[#F6F3EC]"
-                  : "text-stone-700"
+                  ? "bg-stone-900 text-[#F6F3EC]"
+                  : "text-stone-700 hover:text-stone-950"
               }`}
             >
               <span className="font-mono-tabular text-[9px] opacity-60">
                 {item.code}
               </span>
-              <span>{item.label}</span>
+              <span className="whitespace-nowrap text-[10px] font-semibold sm:text-[11px]">
+                {item.label}
+              </span>
             </Link>
           );
         })}
+        {isMod && (
+          <Link
+            href="/admin"
+            className={`flex flex-1 flex-col items-center justify-center rounded-none px-1 py-1 transition ${
+              pathname.startsWith("/admin")
+                ? "bg-amber-900 text-white"
+                : "text-amber-900 hover:bg-amber-100/70"
+            }`}
+          >
+            <span className="font-mono-tabular text-[9px] opacity-70">07</span>
+            <span className="whitespace-nowrap text-[10px] font-semibold sm:text-[11px]">
+              Desk{pendingCount > 0 ? ` (${pendingCount})` : ""}
+            </span>
+          </Link>
+        )}
       </nav>
     </>
   );

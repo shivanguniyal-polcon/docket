@@ -23,12 +23,21 @@ function createPglite(): DB {
 
 const globalForDb = globalThis as unknown as { __docketDb?: DB };
 
-export const db: DB =
-  globalForDb.__docketDb ??
-  (process.env.DATABASE_URL
-    ? createNeon(process.env.DATABASE_URL)
-    : createPglite());
+function getDbInstance(): DB {
+  if (!globalForDb.__docketDb) {
+    globalForDb.__docketDb = process.env.DATABASE_URL
+      ? createNeon(process.env.DATABASE_URL)
+      : createPglite();
+  }
+  return globalForDb.__docketDb;
+}
 
-globalForDb.__docketDb = db;
+export const db: DB = new Proxy({} as DB, {
+  get(_target, prop, receiver) {
+    const instance = getDbInstance();
+    const val = Reflect.get(instance as object, prop, receiver);
+    return typeof val === "function" ? val.bind(instance) : val;
+  },
+});
 
 export { schema };

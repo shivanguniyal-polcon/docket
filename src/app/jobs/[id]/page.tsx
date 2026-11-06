@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
+import { ensureDbReady } from "@/db/auto-bootstrap";
 import { and, desc, eq } from "drizzle-orm";
 import {
   EXPERIENCE,
@@ -38,6 +39,7 @@ export default async function JobDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await ensureDbReady();
   const user = await getUser();
   const { id } = await params;
 
@@ -230,6 +232,7 @@ export default async function JobDetailPage({
         <div className="mt-6">
           <FitScoreWidget
             jobId={jobRow.id}
+            isSignedIn={Boolean(user)}
             initial={
               fit
                 ? {

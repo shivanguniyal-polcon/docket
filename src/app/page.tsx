@@ -211,6 +211,7 @@ export default async function LandingPage() {
             <Link
               key={j.id}
               href={`/jobs/${j.id}`}
+              prefetch={false}
               className="group grid gap-2 px-4 py-3.5 transition hover:bg-[#EFECE4] sm:grid-cols-12 sm:items-center"
             >
               <div className="sm:col-span-3">

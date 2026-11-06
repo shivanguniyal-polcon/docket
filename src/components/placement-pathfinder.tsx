@@ -563,7 +563,7 @@ export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
                     <button
                       type="button"
                       onClick={() => handleCopy(item.text, item.key)}
-                      className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
+                      className="relative z-10 inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
                     >
                       {copiedKey === item.key ? (
                         <>

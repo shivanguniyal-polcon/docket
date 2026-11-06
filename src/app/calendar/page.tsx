@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Calendar as CalendarIcon, Download, ExternalLink, Clock } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
+import { ensureDbReady } from "@/db/auto-bootstrap";
 import { asc, eq, isNotNull } from "drizzle-orm";
 import {
   EXPERIENCE,
@@ -41,6 +42,7 @@ function isMonthInWindow(
 }
 
 export default async function CalendarPage() {
+  await ensureDbReady();
   const user = await getUser();
 
   const [myApps, jobsWithDeadlines, recurring] = await Promise.all([
@@ -198,6 +200,7 @@ export default async function CalendarPage() {
                   <div>
                     <Link
                       href={`/jobs/${j.id}`}
+                      prefetch={false}
                       className="font-semibold text-stone-900 hover:underline"
                     >
                       {j.title}

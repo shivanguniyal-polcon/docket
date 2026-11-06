@@ -167,64 +167,65 @@ function SignInForm() {
         </div>
       </div>
 
-      {/* Preview / Demo Mode Quick Sign-in */}
-      <div className="border border-stone-900 bg-[#EFECE3] p-4 text-xs">
-        <div className="flex items-center justify-between">
-          <span className="font-mono-tabular flex items-center gap-1.5 text-[11px] font-bold text-stone-900 uppercase">
-            <Terminal className="h-3.5 w-3.5" />
-            Instant Cohort / Preview Sign-In
-          </span>
-          <button
-            type="button"
-            onClick={refreshDevInbox}
-            className="font-mono-tabular text-[11px] font-semibold text-stone-800 underline"
-          >
-            Refresh links
-          </button>
-        </div>
-        <p className="mt-1 text-[11px] text-stone-700">
-          Click your IITD account or a seeded cohort persona below to generate an
-          instant sign-in link right here:
-        </p>
-
-        <div className="mt-2.5 flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => quickPick("ppm254500@iitd.ac.in")}
-            className="border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
-          >
-            Shivang Uniyal · Owner (ppm254500@iitd.ac.in)
-          </button>
-        </div>
-
-        {devEmails.length > 0 && (
-          <div className="mt-3 space-y-1.5 border-t border-stone-300 pt-2.5">
-            <div className="font-mono-tabular text-[11px] font-bold text-stone-800 uppercase">
-              Ready Sign-In Links (Click to enter):
-            </div>
-            {devEmails.slice(0, 3).map((m, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between border border-stone-400 bg-[#FBF9F4] p-2"
-              >
-                <div className="truncate pr-2">
-                  <div className="font-bold text-stone-900">{m.to}</div>
-                  <div className="text-[10px] text-stone-600">{m.subject}</div>
-                </div>
-                {m.url && (
-                  <a
-                    href={toRelativeUrl(m.url)}
-                    className="inline-flex shrink-0 items-center gap-1 bg-stone-900 px-2.5 py-1 text-[11px] font-bold text-[#FBF9F4] hover:bg-stone-800"
-                  >
-                    Complete sign-in
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </div>
-            ))}
+      {/* Preview / Demo Mode Quick Sign-in (only shown in local development) */}
+      {process.env.NODE_ENV !== "production" && (
+        <div className="border border-stone-900 bg-[#EFECE3] p-4 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-mono-tabular flex items-center gap-1.5 text-[11px] font-bold text-stone-900 uppercase">
+              <Terminal className="h-3.5 w-3.5" />
+              Instant Local Dev Sign-In
+            </span>
+            <button
+              type="button"
+              onClick={refreshDevInbox}
+              className="font-mono-tabular text-[11px] font-semibold text-stone-800 underline"
+            >
+              Refresh links
+            </button>
           </div>
-        )}
-      </div>
+          <p className="mt-1 text-[11px] text-stone-700">
+            Local development only: click below to mint a session without checking emails:
+          </p>
+
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => quickPick("ppm254500@iitd.ac.in")}
+              className="border border-stone-900 bg-[#FBF9F4] px-2.5 py-1 text-[11px] font-bold text-stone-900 hover:bg-stone-900 hover:text-[#FBF9F4]"
+            >
+              Shivang Uniyal · Owner (ppm254500@iitd.ac.in)
+            </button>
+          </div>
+
+          {devEmails.length > 0 && (
+            <div className="mt-3 space-y-1.5 border-t border-stone-300 pt-2.5">
+              <div className="font-mono-tabular text-[11px] font-bold text-stone-800 uppercase">
+                Ready Sign-In Links (Click to enter):
+              </div>
+              {devEmails.slice(0, 3).map((m, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between border border-stone-400 bg-[#FBF9F4] p-2"
+                >
+                  <div className="truncate pr-2">
+                    <div className="font-bold text-stone-900">{m.to}</div>
+                    <div className="text-[10px] text-stone-600">{m.subject}</div>
+                  </div>
+                  {m.url && (
+                    <a
+                      href={toRelativeUrl(m.url)}
+                      className="inline-flex shrink-0 items-center gap-1 bg-stone-900 px-2.5 py-1 text-[11px] font-bold text-[#FBF9F4] hover:bg-stone-800"
+                    >
+                      Complete sign-in
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

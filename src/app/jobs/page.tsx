@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
-import { and, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
 import {
   EXPERIENCE,
   JOB_TYPES,
@@ -68,25 +68,30 @@ export default async function JobsPage({
     conditions.push(sql`${sector} = ANY(${schema.job.sectors})`);
   }
 
-  const [jobs, userApps, userFits, alumniRows, compNotes] = await Promise.all([
-    db
-      .select()
-      .from(schema.job)
-      .where(and(...conditions))
-      .orderBy(desc(schema.job.postedAt), desc(schema.job.createdAt))
-      .limit(120),
-    user
-      ? db
-          .select()
-          .from(schema.application)
-          .where(eq(schema.application.userId, user.id))
-      : Promise.resolve([]),
-    user
-      ? db
-          .select()
-          .from(schema.fitScore)
-          .where(eq(schema.fitScore.userId, user.id))
-      : Promise.resolve([]),
+  const [[{ totalCount }], jobs, userApps, userFits, alumniRows, compNotes] =
+    await Promise.all([
+      db
+        .select({ totalCount: count() })
+        .from(schema.job)
+        .where(and(...conditions)),
+      db
+        .select()
+        .from(schema.job)
+        .where(and(...conditions))
+        .orderBy(desc(schema.job.postedAt), desc(schema.job.createdAt))
+        .limit(120),
+      user
+        ? db
+            .select()
+            .from(schema.application)
+            .where(eq(schema.application.userId, user.id))
+        : Promise.resolve([]),
+      user
+        ? db
+            .select()
+            .from(schema.fitScore)
+            .where(eq(schema.fitScore.userId, user.id))
+        : Promise.resolve([]),
     db
       .select({
         userName: schema.user.name,
@@ -139,7 +144,7 @@ export default async function JobsPage({
             § 01 · VERIFIED POLICY MANDATE LEDGER
           </div>
           <h1 className="font-serif-editorial mt-1 text-3xl font-normal tracking-tight text-stone-950 sm:text-4xl">
-            Active Openings &amp; Fellowships ({jobs.length})
+            Active Openings &amp; Fellowships ({totalCount > jobs.length ? `${jobs.length} of ${totalCount}` : totalCount})
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -303,6 +308,7 @@ export default async function JobsPage({
               <Link
                 key={pill.href}
                 href={pill.href}
+                prefetch={false}
                 className="border border-stone-400 bg-white px-2 py-0.5 text-[10px] font-semibold text-stone-800 hover:border-stone-900 hover:bg-stone-900 hover:text-[#F6F3EC]"
               >
                 {pill.label}
@@ -379,6 +385,7 @@ export default async function JobsPage({
                     <div>
                       <Link
                         href={`/jobs/${j.id}`}
+                        prefetch={false}
                         className="inline-flex items-center gap-1 border border-stone-900 bg-[#EFECE4] px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-stone-900 hover:bg-stone-900 hover:text-[#F6F3EC]"
                       >
                         <Users className="h-3 w-3" />
@@ -392,6 +399,7 @@ export default async function JobsPage({
                 <div className="space-y-1 lg:col-span-5">
                   <Link
                     href={`/jobs/${j.id}`}
+                    prefetch={false}
                     className="font-serif-editorial block text-lg leading-snug font-normal text-stone-950 hover:underline"
                   >
                     {j.title}
@@ -415,6 +423,7 @@ export default async function JobsPage({
                     <Link
                       key={s}
                       href={`/jobs?sector=${s}`}
+                      prefetch={false}
                       className="border border-stone-300 px-1.5 py-0.5 font-mono-tabular text-[10px] text-stone-600 hover:border-stone-900"
                     >
                       {SECTORS[s as Sector] ?? s}
@@ -427,6 +436,7 @@ export default async function JobsPage({
                   <FitScoreWidget
                     jobId={j.id}
                     compact
+                    isSignedIn={Boolean(user)}
                     initial={
                       fit
                         ? {
@@ -443,6 +453,7 @@ export default async function JobsPage({
                   {tracked ? (
                     <Link
                       href="/tracker"
+                      prefetch={false}
                       className="inline-flex items-center gap-1 border border-emerald-900 bg-emerald-950 px-2.5 py-1 font-mono-tabular text-[10px] font-semibold text-[#F6F3EC] uppercase"
                     >
                       <Check className="h-3 w-3" />
@@ -452,7 +463,7 @@ export default async function JobsPage({
                         ]
                       }
                     </Link>
-                  ) : (
+                  ) : user ? (
                     <>
                       <form action={trackJobAction}>
                         <input type="hidden" name="jobId" value={j.id} />
@@ -477,6 +488,26 @@ export default async function JobsPage({
                         </button>
                       </form>
                     </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/sign-in?next=/jobs"
+                        prefetch={false}
+                        className="inline-flex items-center gap-1 border border-stone-900 bg-white px-2 py-1 font-mono-tabular text-[10px] font-semibold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
+                        title="Sign in to save to ledger"
+                      >
+                        <Bookmark className="h-3 w-3" />
+                        Save
+                      </Link>
+                      <Link
+                        href="/sign-in?next=/jobs"
+                        prefetch={false}
+                        className="border border-stone-900 bg-stone-900 px-2 py-1 font-mono-tabular text-[10px] font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
+                        title="Sign in to mark applied"
+                      >
+                        Applied
+                      </Link>
+                    </>
                   )}
 
                   <a
@@ -489,16 +520,18 @@ export default async function JobsPage({
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </a>
 
-                  <form action={flagNonPolicyJobAction}>
-                    <input type="hidden" name="jobId" value={j.id} />
-                    <button
-                      type="submit"
-                      className="border border-stone-300 bg-white p-1 text-stone-400 hover:border-rose-800 hover:text-rose-800"
-                      title="Hide non-policy role"
-                    >
-                      <EyeOff className="h-3.5 w-3.5" />
-                    </button>
-                  </form>
+                  {user && (
+                    <form action={flagNonPolicyJobAction}>
+                      <input type="hidden" name="jobId" value={j.id} />
+                      <button
+                        type="submit"
+                        className="border border-stone-300 bg-white p-1 text-stone-400 hover:border-rose-800 hover:text-rose-800"
+                        title="Hide non-policy role"
+                      >
+                        <EyeOff className="h-3.5 w-3.5" />
+                      </button>
+                    </form>
+                  )}
                 </div>
               </div>
             );

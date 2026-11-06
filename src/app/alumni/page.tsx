@@ -117,35 +117,45 @@ export default async function AlumniPage() {
                 )}
 
                 {profile.openToReferrals && member.id !== user?.id && (
-                  <details className="text-xs">
-                    <summary className="cursor-pointer rounded-xl bg-stone-900 px-3 py-1.5 text-center font-semibold text-white hover:bg-stone-800">
-                      Request referral / coffee chat
-                    </summary>
-                    <form
-                      action={requestReferralAction}
-                      className="mt-2 space-y-2 rounded-xl border border-stone-200 bg-stone-50 p-3"
-                    >
-                      <input
-                        type="hidden"
-                        name="toUserId"
-                        value={member.id}
-                      />
-                      <textarea
-                        name="message"
-                        required
-                        rows={3}
-                        placeholder={`Hi ${member.name.split(" ")[0]}, I'm in the IITD MPP cohort applying to ${profile.currentOrg ?? "your team"}…`}
-                        className="w-full rounded-lg border border-stone-300 bg-white p-2 text-xs"
-                      />
-                      <button
-                        type="submit"
-                        className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-stone-900 py-1.5 text-xs font-semibold text-white"
+                  user ? (
+                    <details className="text-xs">
+                      <summary className="cursor-pointer rounded-xl bg-stone-900 px-3 py-1.5 text-center font-semibold text-white hover:bg-stone-800">
+                        Request referral / coffee chat
+                      </summary>
+                      <form
+                        action={requestReferralAction}
+                        className="mt-2 space-y-2 rounded-xl border border-stone-200 bg-stone-50 p-3"
                       >
-                        <Send className="h-3 w-3" />
-                        Send email via Docket
-                      </button>
-                    </form>
-                  </details>
+                        <input
+                          type="hidden"
+                          name="toUserId"
+                          value={member.id}
+                        />
+                        <textarea
+                          name="message"
+                          required
+                          rows={3}
+                          placeholder={`Hi ${member.name.split(" ")[0]}, I'm in the IITD MPP cohort applying to ${profile.currentOrg ?? "your team"}…`}
+                          className="w-full rounded-lg border border-stone-300 bg-white p-2 text-xs"
+                        />
+                        <button
+                          type="submit"
+                          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-stone-900 py-1.5 text-xs font-semibold text-white"
+                        >
+                          <Send className="h-3 w-3" />
+                          Send email via Docket
+                        </button>
+                      </form>
+                    </details>
+                  ) : (
+                    <Link
+                      href="/sign-in?next=/alumni"
+                      prefetch={false}
+                      className="block rounded-xl border border-stone-900 bg-stone-900 px-3 py-1.5 text-center text-xs font-semibold text-[#F6F3EC] hover:bg-stone-800"
+                    >
+                      Sign in to request referral →
+                    </Link>
+                  )
                 )}
               </div>
             </div>

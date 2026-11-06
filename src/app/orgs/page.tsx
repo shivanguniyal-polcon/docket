@@ -225,6 +225,7 @@ export default async function OrgsPage({
                 <div className="mt-2.5 flex items-start justify-between gap-2">
                   <Link
                     href={`/orgs/${o.slug}`}
+                    prefetch={false}
                     className="font-serif-editorial flex items-center gap-1.5 text-xl font-normal text-stone-950 hover:underline"
                   >
                     <Building2 className="h-4 w-4 shrink-0 text-stone-600" />
@@ -286,6 +287,7 @@ export default async function OrgsPage({
                 <div className="font-mono-tabular flex items-center gap-3 text-stone-700">
                   <Link
                     href={`/orgs/${o.slug}`}
+                    prefetch={false}
                     className="hover:underline"
                   >
                     <strong className="text-stone-950">{jCount}</strong> live
@@ -293,6 +295,7 @@ export default async function OrgsPage({
                   </Link>
                   <Link
                     href={`/orgs/${o.slug}`}
+                    prefetch={false}
                     className="inline-flex items-center gap-1 hover:underline"
                   >
                     <MessageSquare className="h-3 w-3" />

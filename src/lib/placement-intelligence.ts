@@ -693,7 +693,7 @@ export const MONTHLY_ACTION_WINDOWS: MonthlyActionWindow[] = [
     sectors: ["regulation", "finance", "tech_ai"],
     actionNote:
       "Stipend ₹15,000/month. Covers digital markets, antitrust, and M&A combinations. Submit application before the 1st of the preceding month.",
-    url: "https://www.cci.gov.in/career/inline-internship",
+    url: "https://www.cci.gov.in/internship",
   },
   {
     title: "DPIIT (Ministry of Commerce & Industry) Internship & Young Professional Scheme",

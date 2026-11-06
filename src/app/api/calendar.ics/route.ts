@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
+import { ensureDbReady } from "@/db/auto-bootstrap";
 import { eq, isNotNull } from "drizzle-orm";
 
 function escapeIcs(text: string): string {
@@ -16,16 +17,16 @@ function formatIcsDate(dateStr: string): string {
 }
 
 export async function GET() {
+  await ensureDbReady();
   const user = await getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
 
   const [apps, jobsWithDeadlines, recurring] = await Promise.all([
-    db
-      .select()
-      .from(schema.application)
-      .where(eq(schema.application.userId, user.id)),
+    user
+      ? db
+          .select()
+          .from(schema.application)
+          .where(eq(schema.application.userId, user.id))
+      : Promise.resolve([]),
     db
       .select()
       .from(schema.job)

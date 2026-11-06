@@ -23,10 +23,12 @@ export function FitScoreWidget({
   jobId,
   initial,
   compact = false,
+  isSignedIn = false,
 }: {
   jobId: string;
   initial?: FitData | null;
   compact?: boolean;
+  isSignedIn?: boolean;
 }) {
   const [fit, setFit] = useState<FitData | null>(initial ?? null);
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,10 @@ export function FitScoreWidget({
   const [copied, setCopied] = useState(false);
 
   async function runScore(force = false) {
+    if (!isSignedIn) {
+      window.location.href = `/sign-in?next=${encodeURIComponent(compact ? "/jobs" : `/jobs/${jobId}`)}`;
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/fit", {
@@ -47,7 +53,7 @@ export function FitScoreWidget({
         body: JSON.stringify({ jobId, force }),
       });
       if (res.status === 401) {
-        window.location.href = "/sign-in";
+        window.location.href = `/sign-in?next=${encodeURIComponent(compact ? "/jobs" : `/jobs/${jobId}`)}`;
         return;
       }
       if (res.ok) {
@@ -60,6 +66,10 @@ export function FitScoreWidget({
   }
 
   async function runDraftCoverNote() {
+    if (!isSignedIn) {
+      window.location.href = `/sign-in?next=${encodeURIComponent(`/jobs/${jobId}`)}`;
+      return;
+    }
     setDrafting(true);
     try {
       const res = await fetch("/api/cover-note", {
@@ -68,7 +78,7 @@ export function FitScoreWidget({
         body: JSON.stringify({ jobId }),
       });
       if (res.status === 401) {
-        window.location.href = "/sign-in";
+        window.location.href = `/sign-in?next=${encodeURIComponent(`/jobs/${jobId}`)}`;
         return;
       }
       if (res.ok) {
@@ -204,8 +214,9 @@ export function FitScoreWidget({
         </div>
       ) : (
         <p className="mt-2 text-xs text-stone-600">
-          Compares this role against your private CV and skills in Settings.
-          Your resume never leaves your control.
+          {isSignedIn
+            ? "Compares this role against your private CV and skills in Settings. Your resume never leaves your control."
+            : "Sign in with your @iitd.ac.in account to compare this mandate against your private CV and auto-draft tailored outreach emails."}
         </p>
       )}
 

@@ -4,6 +4,7 @@ import { getUser, isModerator } from "@/lib/session";
 import { db, schema } from "@/db";
 import { desc } from "drizzle-orm";
 import { saveResourceAction } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 import { PlacementPathfinder } from "@/components/placement-pathfinder";
 
 const CATEGORIES: Record<string, string> = {
@@ -352,13 +353,13 @@ export default async function ResourcesPage({
                   placeholder="Playbook content…"
                   className="w-full border border-stone-400 bg-white p-2.5 font-mono-tabular text-xs"
                 />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1 border border-stone-900 bg-stone-900 px-3 py-1.5 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase"
+                <SubmitButton
+                  pendingText="Saving Playbook…"
+                  icon={<Plus className="h-3.5 w-3.5" />}
+                  className="border border-stone-900 bg-stone-900 px-3 py-1.5 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase"
                 >
-                  <Plus className="h-3.5 w-3.5" />
                   Save Playbook
-                </button>
+                </SubmitButton>
               </form>
             </details>
           )}

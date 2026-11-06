@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   RotateCcw,
   FileText,
+  Loader2,
 } from "lucide-react";
 import {
   BACKGROUND_PROFILES,
@@ -217,6 +218,7 @@ export function PlacementPathfinder({
   );
   const [memoDraft, setMemoDraft] = useState<string>("");
   const [auditReport, setAuditReport] = useState<AuditResult | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
 
   function handleLoadSampleMemo(bpId = selectedBlueprintId) {
     const s = SAMPLE_MEMOS[bpId] || "";
@@ -225,9 +227,13 @@ export function PlacementPathfinder({
   }
 
   function handleRunAudit() {
-    if (!memoDraft.trim()) return;
-    const res = auditMemo(memoDraft, activeBlueprint);
-    setAuditReport(res);
+    if (!memoDraft.trim() || isAuditing) return;
+    setIsAuditing(true);
+    setTimeout(() => {
+      const res = auditMemo(memoDraft, activeBlueprint);
+      setAuditReport(res);
+      setIsAuditing(false);
+    }, 350);
   }
 
   const profile =
@@ -461,10 +467,17 @@ export function PlacementPathfinder({
                   onClick={handleBulkAddToTracker}
                   className="inline-flex w-full items-center justify-center gap-1.5 bg-stone-900 px-4 py-2.5 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800 disabled:opacity-50"
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  {isPending
-                    ? "Adding Target List to Your Tracker…"
-                    : `Add All ${matchedOrgs.length} Matched Orgs to My Tracker →`}
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                      <span>Adding Target List to Your Tracker…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Add All {matchedOrgs.length} Matched Orgs to My Tracker →</span>
+                    </>
+                  )}
                 </button>
                 {addedCount !== null && (
                   <div className="mt-1.5 text-center font-mono-tabular text-[11px] font-bold text-emerald-800">
@@ -926,11 +939,20 @@ export function PlacementPathfinder({
               <button
                 type="button"
                 onClick={handleRunAudit}
-                disabled={!memoDraft.trim()}
+                disabled={!memoDraft.trim() || isAuditing}
                 className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-bold text-[#FBF9F4] uppercase hover:bg-stone-800 disabled:opacity-50"
               >
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                Audit Memo Against Rubric
+                {isAuditing ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-amber-400" />
+                    <span>Auditing BLUF &amp; Indian Citations…</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                    <span>Audit Memo Against Rubric</span>
+                  </>
+                )}
               </button>
             </div>
 

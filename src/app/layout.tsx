@@ -7,6 +7,7 @@ import {
 import "./globals.css";
 import { getUser, isModerator } from "@/lib/session";
 import { AppNav } from "@/components/nav";
+import { TopProgressBar } from "@/components/top-progress-bar";
 import { db, schema } from "@/db";
 import { ensureDbReady } from "@/db/auto-bootstrap";
 import { count, eq } from "drizzle-orm";
@@ -62,6 +63,7 @@ export default async function RootLayout({
       className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#F6F3EC] text-[#141413] selection:bg-stone-900 selection:text-[#F6F3EC]">
+        <TopProgressBar />
         <AppNav
           user={
             user

@@ -5,6 +5,7 @@ import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { SECTORS, type Sector } from "@/lib/taxonomy";
 import { requestReferralAction } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 export default async function AlumniPage() {
   const user = await getUser();
@@ -138,13 +139,13 @@ export default async function AlumniPage() {
                           placeholder={`Hi ${member.name.split(" ")[0]}, I'm in the IITD MPP cohort applying to ${profile.currentOrg ?? "your team"}…`}
                           className="w-full rounded-lg border border-stone-300 bg-white p-2 text-xs"
                         />
-                        <button
-                          type="submit"
-                          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-stone-900 py-1.5 text-xs font-semibold text-white"
+                        <SubmitButton
+                          pendingText="Sending…"
+                          icon={<Send className="h-3 w-3" />}
+                          className="w-full rounded-lg bg-stone-900 py-1.5 text-xs font-semibold text-white"
                         >
-                          <Send className="h-3 w-3" />
                           Send email via Docket
-                        </button>
+                        </SubmitButton>
                       </form>
                     </details>
                   ) : (

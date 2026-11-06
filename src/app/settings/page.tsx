@@ -18,6 +18,7 @@ import {
   updateProfileAction,
   uploadResumeAction,
 } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 export default async function SettingsPage({
   searchParams,
@@ -103,13 +104,12 @@ export default async function SettingsPage({
               {e.kind === "personal" && (
                 <form action={removePersonalEmailAction}>
                   <input type="hidden" name="id" value={e.id} />
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingText=""
+                    icon={<Trash2 className="h-3.5 w-3.5" />}
                     className="text-stone-400 hover:text-rose-600"
                     title="Remove backup email"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  />
                 </form>
               )}
             </div>
@@ -127,12 +127,12 @@ export default async function SettingsPage({
             placeholder="Add personal email (e.g. name@gmail.com)"
             className="flex-1 rounded-xl border border-stone-300 px-3 py-2 text-xs"
           />
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Sending link…"
             className="rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
           >
             Send verification link
-          </button>
+          </SubmitButton>
         </form>
       </section>
 
@@ -145,13 +145,13 @@ export default async function SettingsPage({
           </div>
           {profile?.resumeFileName && (
             <form action={deleteResumeAction}>
-              <button
-                type="submit"
+              <SubmitButton
+                pendingText="Deleting CV text…"
+                icon={<Trash2 className="h-3.5 w-3.5" />}
                 className="inline-flex items-center gap-1 text-xs font-medium text-rose-600 hover:underline"
               >
-                <Trash2 className="h-3.5 w-3.5" />
                 Delete stored CV text
-              </button>
+              </SubmitButton>
             </form>
           )}
         </div>
@@ -199,12 +199,12 @@ export default async function SettingsPage({
             />
           </div>
 
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Saving CV…"
             className="rounded-xl bg-stone-900 px-4 py-2 font-semibold text-white hover:bg-stone-800"
           >
             Save Private CV
-          </button>
+          </SubmitButton>
         </form>
       </section>
 
@@ -386,12 +386,12 @@ export default async function SettingsPage({
             </div>
           </div>
 
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Saving Profile…"
             className="rounded-xl bg-stone-900 px-5 py-2.5 font-semibold text-white hover:bg-stone-800"
           >
             Save Profile &amp; Preferences
-          </button>
+          </SubmitButton>
         </form>
       </section>
 
@@ -409,12 +409,12 @@ export default async function SettingsPage({
             </p>
           </div>
           <form action={deleteAccountAction}>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingText="Deleting account…"
               className="shrink-0 rounded-xl border border-rose-300 bg-white px-3.5 py-2 font-semibold text-rose-700 hover:bg-rose-100"
             >
               Delete my account
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </section>

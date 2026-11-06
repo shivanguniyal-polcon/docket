@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Plus } from "lucide-react";
+import { LogOut, Plus, Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
 interface NavUser {
@@ -31,12 +32,18 @@ export function AppNav({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const isMod = user?.role === "owner" || user?.role === "moderator";
 
   async function handleSignOut() {
-    await authClient.signOut();
-    router.push("/");
-    router.refresh();
+    setIsSigningOut(true);
+    try {
+      await authClient.signOut();
+      router.push("/");
+      router.refresh();
+    } finally {
+      setIsSigningOut(false);
+    }
   }
 
   return (
@@ -136,10 +143,15 @@ export function AppNav({
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="border border-stone-300 bg-[#FBF9F4] p-1.5 text-stone-600 hover:border-stone-900 hover:text-stone-950"
+                  disabled={isSigningOut}
+                  className="border border-stone-300 bg-[#FBF9F4] p-1.5 text-stone-600 hover:border-stone-900 hover:text-stone-950 disabled:opacity-50"
                   title="Sign out"
                 >
-                  <LogOut className="h-3.5 w-3.5" />
+                  {isSigningOut ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-900" />
+                  ) : (
+                    <LogOut className="h-3.5 w-3.5" />
+                  )}
                 </button>
               </>
             ) : (

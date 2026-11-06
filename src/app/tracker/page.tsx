@@ -22,6 +22,7 @@ import {
   moveApplicationStatusAction,
   updateApplicationAction,
 } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 const COLUMNS: {
   key: ApplicationStatus;
@@ -249,12 +250,12 @@ export default async function TrackerPage() {
             placeholder="Notes / contact person (optional)"
             className="rounded-xl border border-stone-300 px-3 py-2 text-xs sm:col-span-2"
           />
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Adding to Tracker…"
             className="rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
           >
             Add to Tracker
-          </button>
+          </SubmitButton>
         </form>
       </details>
 
@@ -421,12 +422,12 @@ export default async function TrackerPage() {
                                   name="status"
                                   value="interviewing"
                                 />
-                                <button
-                                  type="submit"
+                                <SubmitButton
+                                  pendingText="Updating…"
                                   className="rounded bg-emerald-800 px-2 py-0.5 font-bold text-white hover:bg-emerald-700"
                                 >
                                   ✓ Interview / Assignment
-                                </button>
+                                </SubmitButton>
                               </form>
                               <form action={moveApplicationStatusAction}>
                                 <input type="hidden" name="id" value={a.id} />
@@ -435,12 +436,12 @@ export default async function TrackerPage() {
                                   name="status"
                                   value="withdrawn"
                                 />
-                                <button
-                                  type="submit"
+                                <SubmitButton
+                                  pendingText="Updating…"
                                   className="rounded border border-stone-300 bg-white px-2 py-0.5 text-stone-700 hover:bg-stone-100"
                                 >
                                   Ghosted (14+ d)
-                                </button>
+                                </SubmitButton>
                               </form>
                               <form action={moveApplicationStatusAction}>
                                 <input type="hidden" name="id" value={a.id} />
@@ -449,12 +450,12 @@ export default async function TrackerPage() {
                                   name="status"
                                   value="rejected"
                                 />
-                                <button
-                                  type="submit"
+                                <SubmitButton
+                                  pendingText="Updating…"
                                   className="rounded border border-rose-300 bg-rose-50 px-2 py-0.5 text-rose-800 hover:bg-rose-100"
                                 >
                                   Rejected
-                                </button>
+                                </SubmitButton>
                               </form>
                             </div>
                           </div>
@@ -494,25 +495,24 @@ export default async function TrackerPage() {
                                   name="status"
                                   value={nextStatus}
                                 />
-                                <button
-                                  type="submit"
+                                <SubmitButton
+                                  pendingText="Moving…"
                                   className="rounded-md border border-stone-200 bg-stone-50 px-2 py-0.5 text-[10px] font-medium text-stone-700 hover:bg-stone-900 hover:text-white"
                                 >
                                   → {APPLICATION_STATUS_LABELS[nextStatus]}
-                                </button>
+                                </SubmitButton>
                               </form>
                             ))}
                           </div>
 
                           <form action={deleteApplicationAction}>
                             <input type="hidden" name="id" value={a.id} />
-                            <button
-                              type="submit"
+                            <SubmitButton
+                              pendingText=""
+                              icon={<Trash2 className="h-3.5 w-3.5" />}
                               className="p-1 text-stone-400 hover:text-rose-600"
                               title="Remove from tracker"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            />
                           </form>
                         </div>
 
@@ -605,12 +605,12 @@ export default async function TrackerPage() {
                               Count anonymously toward cohort outcome stats (n ≥
                               5)
                             </label>
-                            <button
-                              type="submit"
+                            <SubmitButton
+                              pendingText="Saving changes…"
                               className="w-full rounded-lg bg-stone-900 py-1.5 text-xs font-semibold text-white"
                             >
                               Save changes
-                            </button>
+                            </SubmitButton>
                           </form>
                         </details>
                       </div>

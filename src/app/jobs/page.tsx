@@ -27,6 +27,7 @@ import {
 } from "@/lib/taxonomy";
 import { trackJobAction, flagNonPolicyJobAction } from "@/app/actions";
 import { FitScoreWidget } from "@/components/fit-score-widget";
+import { SubmitButton } from "@/components/loading-button";
 import {
   MONTHLY_ACTION_WINDOWS,
   BACKGROUND_PROFILES,
@@ -599,12 +600,12 @@ export default async function JobsPage({
                 CLEAR
               </Link>
             )}
-            <button
-              type="submit"
+            <SubmitButton
+              pendingText="Filtering…"
               className="border border-stone-900 bg-stone-900 px-4 py-1.5 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
             >
               Filter Ledger
-            </button>
+            </SubmitButton>
           </div>
         </div>
       </form>
@@ -756,24 +757,24 @@ export default async function JobsPage({
                       <form action={trackJobAction}>
                         <input type="hidden" name="jobId" value={j.id} />
                         <input type="hidden" name="status" value="saved" />
-                        <button
-                          type="submit"
-                          className="inline-flex items-center gap-1 border border-stone-900 bg-white px-2 py-1 font-mono-tabular text-[10px] font-semibold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
+                        <SubmitButton
+                          pendingText="Saving…"
+                          icon={<Bookmark className="h-3 w-3" />}
+                          className="border border-stone-900 bg-white px-2 py-1 font-mono-tabular text-[10px] font-semibold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
                           title="Save to Ledger"
                         >
-                          <Bookmark className="h-3 w-3" />
                           Save
-                        </button>
+                        </SubmitButton>
                       </form>
                       <form action={trackJobAction}>
                         <input type="hidden" name="jobId" value={j.id} />
                         <input type="hidden" name="status" value="applied" />
-                        <button
-                          type="submit"
+                        <SubmitButton
+                          pendingText="Applying…"
                           className="border border-stone-900 bg-stone-900 px-2 py-1 font-mono-tabular text-[10px] font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
                         >
                           Applied
-                        </button>
+                        </SubmitButton>
                       </form>
                     </>
                   ) : (

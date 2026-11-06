@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Mail, Shield, CheckCircle2, ExternalLink, Terminal } from "lucide-react";
+import { Mail, Shield, CheckCircle2, ExternalLink, Terminal, Loader2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
 interface DevEmail {
@@ -138,11 +138,16 @@ function SignInForm() {
           <button
             type="submit"
             disabled={status === "sending"}
-            className="w-full bg-stone-900 py-2.5 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800 disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-1.5 bg-stone-900 py-2.5 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800 disabled:opacity-50"
           >
-            {status === "sending"
-              ? "Generating Sign-In Link…"
-              : "Send Sign-In Magic Link →"}
+            {status === "sending" ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>Generating Sign-In Link…</span>
+              </>
+            ) : (
+              <span>Send Sign-In Magic Link →</span>
+            )}
           </button>
         </form>
 

@@ -35,6 +35,7 @@ import {
   requestReferralAction,
   reportClosedJobAction,
 } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 import { FitScoreWidget } from "@/components/fit-score-widget";
 import { ORG_HIRING_PLAYBOOK } from "@/lib/placement-intelligence";
 
@@ -230,23 +231,23 @@ export default async function JobDetailPage({
                 <form action={trackJobAction}>
                   <input type="hidden" name="jobId" value={jobRow.id} />
                   <input type="hidden" name="status" value="saved" />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50"
+                  <SubmitButton
+                    pendingText="Saving…"
+                    icon={<Bookmark className="h-3.5 w-3.5" />}
+                    className="rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50"
                   >
-                    <Bookmark className="h-3.5 w-3.5" />
                     Save to Tracker
-                  </button>
+                  </SubmitButton>
                 </form>
                 <form action={trackJobAction}>
                   <input type="hidden" name="jobId" value={jobRow.id} />
                   <input type="hidden" name="status" value="applied" />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+                  <SubmitButton
+                    pendingText="Marking Applied…"
+                    className="rounded-xl bg-stone-900 px-3.5 py-2 text-xs font-semibold text-white hover:bg-stone-800"
                   >
                     Mark as Applied
-                  </button>
+                  </SubmitButton>
                 </form>
               </>
             )}
@@ -287,14 +288,14 @@ export default async function JobDetailPage({
 
             <form action={reportClosedJobAction}>
               <input type="hidden" name="jobId" value={jobRow.id} />
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs text-stone-500 hover:border-rose-400 hover:text-rose-700"
+              <SubmitButton
+                pendingText="Reporting…"
+                icon={<AlertCircle className="h-3.5 w-3.5" />}
+                className="rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs text-stone-500 hover:border-rose-400 hover:text-rose-700"
                 title="Report this job as closed or dead link to save cohort time"
               >
-                <AlertCircle className="h-3.5 w-3.5" />
                 Report Closed
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </div>
@@ -401,13 +402,13 @@ export default async function JobDetailPage({
                           defaultValue={`Hi ${alum.name.split(" ")[0]}, I'm in the IITD MPP cohort applying for "${jobRow.title}" at ${jobRow.orgName}. Would love any quick tips on the assignment/interview or a referral if appropriate!`}
                           className="w-full rounded border border-stone-300 p-1.5 text-xs"
                         />
-                        <button
-                          type="submit"
-                          className="inline-flex items-center gap-1 rounded bg-stone-900 px-2.5 py-1 text-[11px] font-semibold text-white"
+                        <SubmitButton
+                          pendingText="Sending…"
+                          icon={<Send className="h-3 w-3" />}
+                          className="rounded bg-stone-900 px-2.5 py-1 text-[11px] font-semibold text-white"
                         >
-                          <Send className="h-3 w-3" />
                           Send request
-                        </button>
+                        </SubmitButton>
                       </form>
                     </details>
                   )}
@@ -425,13 +426,13 @@ export default async function JobDetailPage({
             </h2>
             <form action={refreshJobJDAction}>
               <input type="hidden" name="jobId" value={jobRow.id} />
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 hover:bg-stone-50"
+              <SubmitButton
+                pendingText="Extracting JD…"
+                icon={<RefreshCw className="h-3 w-3" />}
+                className="rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 hover:bg-stone-50"
               >
-                <RefreshCw className="h-3 w-3" />
                 Live-extract / refresh full JD from URL
-              </button>
+              </SubmitButton>
             </form>
           </div>
           <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-700">

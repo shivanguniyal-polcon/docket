@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PlusCircle, Sparkles, Loader2, MessageSquareText } from "lucide-react";
 import { EXPERIENCE, JOB_TYPES, SECTORS } from "@/lib/taxonomy";
 import { submitJobAction } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 export function SubmitJobForm({
   orgs,
@@ -175,8 +176,12 @@ export function SubmitJobForm({
           disabled={extracting || !rawText.trim()}
           className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-stone-800 disabled:opacity-50"
         >
-          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-          Parse WhatsApp / LinkedIn Forward
+          {extracting ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+          )}
+          {extracting ? "Parsing Forward…" : "Parse WhatsApp / LinkedIn Forward"}
         </button>
       </details>
 
@@ -334,13 +339,13 @@ export function SubmitJobForm({
         />
       </div>
 
-      <button
-        type="submit"
-        className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-stone-800"
+      <SubmitButton
+        pendingText={autoPublish ? "Publishing…" : "Submitting…"}
+        icon={<PlusCircle className="h-4 w-4" />}
+        className="rounded-xl bg-stone-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-stone-800"
       >
-        <PlusCircle className="h-4 w-4" />
         {autoPublish ? "Publish Opening" : "Submit for Moderator Review"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

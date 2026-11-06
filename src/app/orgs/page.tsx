@@ -22,6 +22,7 @@ import {
   type BackgroundId,
 } from "@/lib/placement-intelligence";
 import { addOrgTargetToTrackerAction } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 const BG_SHORT: Record<BackgroundId, string> = {
   upsc_humanities: "UPSC / Law / Humanities",
@@ -160,12 +161,12 @@ export default async function OrgsPage({
           ))}
         </select>
         <div className="flex gap-2">
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Filtering Atlas…"
             className="flex-1 bg-stone-900 px-4 py-2 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800"
           >
             Filter Atlas
-          </button>
+          </SubmitButton>
           {(category || sector || bg || q) && (
             <Link
               href="/orgs"
@@ -319,12 +320,13 @@ export default async function OrgsPage({
                       name="notes"
                       value={`[${channelBadge}] ${howToApply}`}
                     />
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1 border border-stone-900 bg-white px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+                    <SubmitButton
+                      pendingText="Adding…"
+                      icon={<Plus className="h-3 w-3" />}
+                      className="border border-stone-900 bg-white px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
                     >
-                      <Plus className="h-3 w-3" />+ Target Pipeline
-                    </button>
+                      + Target Pipeline
+                    </SubmitButton>
                   </form>
 
                   <a

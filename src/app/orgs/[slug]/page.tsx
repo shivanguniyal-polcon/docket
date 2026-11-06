@@ -26,6 +26,7 @@ import {
   ASSIGNMENT_BLUEPRINTS,
 } from "@/lib/placement-intelligence";
 import { addOrgNoteAction, deleteOrgNoteAction } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 export default async function OrgDetailPage({
   params,
@@ -448,13 +449,13 @@ export default async function OrgDetailPage({
             className="w-full rounded-xl border border-stone-300 bg-white p-3 text-xs"
           />
 
-          <button
-            type="submit"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+          <SubmitButton
+            pendingText="Saving note…"
+            icon={<MessageSquarePlus className="h-3.5 w-3.5" />}
+            className="rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
           >
-            <MessageSquarePlus className="h-3.5 w-3.5" />
             Save Note for Future Batches
-          </button>
+          </SubmitButton>
         </form>
 
         <div className="mt-4 space-y-3">
@@ -507,13 +508,12 @@ export default async function OrgDetailPage({
                       <form action={deleteOrgNoteAction}>
                         <input type="hidden" name="noteId" value={note.id} />
                         <input type="hidden" name="orgSlug" value={org.slug} />
-                        <button
-                          type="submit"
+                        <SubmitButton
+                          pendingText=""
+                          icon={<Trash2 className="h-3.5 w-3.5" />}
                           className="text-stone-400 hover:text-rose-600"
                           title="Delete note"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        />
                       </form>
                     )}
                   </div>

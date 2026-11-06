@@ -19,6 +19,7 @@ import {
   syncSnapshotAction,
   triggerSourceRunAction,
 } from "@/app/actions";
+import { SubmitButton } from "@/components/loading-button";
 
 export default async function AdminPage() {
   const mod = await requireModerator();
@@ -83,24 +84,24 @@ export default async function AdminPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           <form action={syncSnapshotAction}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 border border-stone-900 bg-[#FBF9F4] px-4 py-2 font-mono-tabular text-xs font-semibold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
+            <SubmitButton
+              pendingText="Syncing Snapshot…"
+              icon={<RefreshCw className="h-3.5 w-3.5" />}
+              className="border border-stone-900 bg-[#FBF9F4] px-4 py-2 font-mono-tabular text-xs font-semibold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC]"
             >
-              <RefreshCw className="h-3.5 w-3.5" />
               Sync Git / R2 Snapshot (seed/crawled-jobs.json)
-            </button>
+            </SubmitButton>
           </form>
 
           <form action={triggerSourceRunAction}>
             <input type="hidden" name="sourceId" value="ALL" />
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
+            <SubmitButton
+              pendingText="Scanning ATS…"
+              icon={<RefreshCw className="h-3.5 w-3.5" />}
+              className="border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
             >
-              <RefreshCw className="h-3.5 w-3.5" />
               Run Live ATS Scan
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
@@ -153,24 +154,24 @@ export default async function AdminPage() {
                   <form action={reviewJobAction}>
                     <input type="hidden" name="jobId" value={j.id} />
                     <input type="hidden" name="decision" value="published" />
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800"
+                    <SubmitButton
+                      pendingText="Publishing…"
+                      icon={<Check className="h-3.5 w-3.5" />}
+                      className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-800"
                     >
-                      <Check className="h-3.5 w-3.5" />
                       Publish
-                    </button>
+                    </SubmitButton>
                   </form>
                   <form action={reviewJobAction}>
                     <input type="hidden" name="jobId" value={j.id} />
                     <input type="hidden" name="decision" value="rejected" />
-                    <button
-                      type="submit"
-                      className="inline-flex items-center gap-1 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100"
+                    <SubmitButton
+                      pendingText="Rejecting…"
+                      icon={<X className="h-3.5 w-3.5" />}
+                      className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100"
                     >
-                      <X className="h-3.5 w-3.5" />
                       Reject
-                    </button>
+                    </SubmitButton>
                   </form>
                 </div>
               </div>
@@ -226,12 +227,12 @@ export default async function AdminPage() {
                     <form action={resolvePageChangeAction}>
                       <input type="hidden" name="id" value={change.id} />
                       <input type="hidden" name="status" value="resolved" />
-                      <button
-                        type="submit"
+                      <SubmitButton
+                        pendingText="Resolving…"
                         className="rounded-lg border border-stone-300 bg-white px-2.5 py-1 font-medium text-stone-700"
                       >
                         Mark resolved
-                      </button>
+                      </SubmitButton>
                     </form>
                   </div>
                 </div>
@@ -272,12 +273,12 @@ export default async function AdminPage() {
               </div>
               <form action={triggerSourceRunAction}>
                 <input type="hidden" name="sourceId" value={s.id} />
-                <button
-                  type="submit"
+                <SubmitButton
+                  pendingText="Running…"
                   className="rounded-lg border border-stone-300 bg-stone-50 px-2.5 py-1 text-[11px] font-semibold text-stone-800 hover:bg-stone-900 hover:text-white"
                 >
                   Run
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}
@@ -331,12 +332,12 @@ export default async function AdminPage() {
                       </option>
                     ))}
                   </select>
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingText="Updating…"
                     className="rounded-lg bg-stone-900 px-3 py-1 font-semibold text-white hover:bg-stone-800"
                   >
                     Update role
-                  </button>
+                  </SubmitButton>
                 </form>
               ) : (
                 <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">

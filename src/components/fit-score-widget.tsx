@@ -12,6 +12,7 @@ import {
   ChevronDown,
   User,
   SlidersHorizontal,
+  Loader2,
 } from "lucide-react";
 import type { OutreachFormat } from "@/lib/ai";
 
@@ -254,7 +255,11 @@ export function FitScoreWidget({
           className="inline-flex items-center gap-1 border border-stone-900 bg-white px-2 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#F6F3EC] disabled:opacity-50"
           title="Calculate instant candidate fit score (No login required)"
         >
-          <Sparkles className="h-3 w-3 text-amber-700" />
+          {loading ? (
+            <Loader2 className="h-3 w-3 animate-spin text-amber-700" />
+          ) : (
+            <Sparkles className="h-3 w-3 text-amber-700" />
+          )}
           {loading ? "Scoring…" : "Check fit"}
         </button>
       );
@@ -267,8 +272,12 @@ export function FitScoreWidget({
         title={fit.summary ?? undefined}
         className={`inline-flex items-center gap-1 border px-2 py-0.5 font-mono-tabular text-[10px] uppercase transition hover:opacity-80 ${badgeColor}`}
       >
-        <Sparkles className="h-3 w-3" />
-        {fit.score}% fit
+        {loading ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Sparkles className="h-3 w-3" />
+        )}
+        {loading ? "Scoring…" : `${fit.score}% fit`}
       </button>
     );
   }
@@ -443,13 +452,20 @@ export function FitScoreWidget({
                 type="button"
                 onClick={() => runDraftCoverNote(fmt.id)}
                 disabled={drafting}
-                className={`border px-2.5 py-1 font-mono-tabular text-[10px] font-bold uppercase transition ${
+                className={`inline-flex items-center gap-1 border px-2.5 py-1 font-mono-tabular text-[10px] font-bold uppercase transition ${
                   outreachType === fmt.id && coverNote
                     ? "border-stone-900 bg-stone-900 text-[#FBF9F4]"
                     : "border-stone-400 bg-white text-stone-800 hover:border-stone-900"
-                }`}
+                } ${drafting && outreachType === fmt.id ? "opacity-80 cursor-wait" : ""}`}
               >
-                {fmt.label}
+                {drafting && outreachType === fmt.id ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Drafting…</span>
+                  </>
+                ) : (
+                  fmt.label
+                )}
               </button>
             ))}
           </div>

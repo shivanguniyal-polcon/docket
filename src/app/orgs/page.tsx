@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { Building2, ExternalLink, MapPin, MessageSquare } from "lucide-react";
+import {
+  Building2,
+  ExternalLink,
+  MapPin,
+  MessageSquare,
+  Plus,
+  Compass,
+} from "lucide-react";
 import { requireUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { asc, eq } from "drizzle-orm";
@@ -9,16 +16,35 @@ import {
   label,
   type Sector,
 } from "@/lib/taxonomy";
+import {
+  ORG_HIRING_PLAYBOOK,
+  BACKGROUND_PROFILES,
+  type BackgroundId,
+} from "@/lib/placement-intelligence";
+import { addOrgTargetToTrackerAction } from "@/app/actions";
+
+const BG_SHORT: Record<BackgroundId, string> = {
+  upsc_humanities: "UPSC / Law / Humanities",
+  stem_btech: "B.Tech / STEM Pivot",
+  econ_quant: "Econ / Quant / Stats",
+  work_ex: "2–6+ Yrs Work-Ex",
+};
 
 export default async function OrgsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; sector?: string; q?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    sector?: string;
+    bg?: string;
+    q?: string;
+  }>;
 }) {
   await requireUser();
   const params = await searchParams;
   const category = (params.category ?? "").trim();
   const sector = (params.sector ?? "").trim();
+  const bg = (params.bg ?? "").trim() as BackgroundId | "";
   const q = (params.q ?? "").trim().toLowerCase();
 
   const [orgs, jobs, notes] = await Promise.all([
@@ -42,11 +68,13 @@ export default async function OrgsPage({
   }
 
   const filtered = orgs.filter((o) => {
+    const playbook = ORG_HIRING_PLAYBOOK[o.slug];
     if (category && o.category !== category) return false;
     if (sector && !o.sectors.includes(sector)) return false;
+    if (bg && playbook && !playbook.bestFor.includes(bg)) return false;
     if (
       q &&
-      !`${o.name} ${o.description ?? ""} ${o.hq ?? ""}`
+      !`${o.name} ${o.description ?? ""} ${o.hq ?? ""} ${playbook?.entryRoles ?? ""}`
         .toLowerCase()
         .includes(q)
     )
@@ -55,38 +83,64 @@ export default async function OrgsPage({
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">
-          Policy Organization Directory &amp; Cohort Knowledge ({filtered.length}
-          )
-        </h1>
-        <p className="text-xs text-stone-600">
-          Curated think tanks, consulting firms, foundations, government bodies
-          &amp; multilaterals — with shared batch notes and anonymous outcome
-          statistics.
-        </p>
+    <div className="space-y-8">
+      {/* Masthead */}
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-stone-900 pb-4">
+        <div>
+          <div className="font-mono-tabular text-[11px] font-bold tracking-widest text-amber-900 uppercase">
+            § 04 · THE ALWAYS-ON WHERE-TO-APPLY ATLAS ({filtered.length} INSTITUTIONS)
+          </div>
+          <h1 className="font-serif-editorial mt-1 text-3xl font-normal tracking-tight text-stone-950 sm:text-4xl">
+            Master Policy Employer Directory &amp; Hiring Channels
+          </h1>
+          <p className="mt-1 max-w-3xl text-xs leading-relaxed text-stone-700">
+            Even when an organization has <strong>0 scraped postings today</strong>,
+            60% of policy hiring happens via rolling portals, monthly statutory
+            windows, or direct 2-page brief outreach. Use this atlas to see exact
+            entry titles, background fit, and how to apply year-round.
+          </p>
+        </div>
+
+        <Link
+          href="/resources"
+          className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-3.5 py-2 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800"
+        >
+          <Compass className="h-3.5 w-3.5" />
+          Where Should I Apply? Diagnostic →
+        </Link>
       </div>
 
       {/* Filters */}
       <form
         method="GET"
         action="/orgs"
-        className="grid gap-3 rounded-2xl border border-stone-200 bg-white p-4 sm:grid-cols-4"
+        className="grid gap-3 border border-stone-900 bg-[#FBF9F4] p-4 sm:grid-cols-2 lg:grid-cols-5"
       >
         <input
           type="text"
           name="q"
           defaultValue={params.q ?? ""}
-          placeholder="Search organization or city…"
-          className="rounded-xl border border-stone-300 px-3 py-2 text-xs"
+          placeholder="Search organization, role title, or city…"
+          className="border border-stone-400 bg-white px-3 py-2 text-xs text-stone-900 focus:border-stone-900 focus:outline-none"
         />
+        <select
+          name="bg"
+          defaultValue={bg}
+          className="border border-stone-400 bg-white px-3 py-2 text-xs font-semibold text-stone-900"
+        >
+          <option value="">All Student Backgrounds</option>
+          {BACKGROUND_PROFILES.map((b) => (
+            <option key={b.id} value={b.id}>
+              Best Fit: {b.shortLabel}
+            </option>
+          ))}
+        </select>
         <select
           name="category"
           defaultValue={category}
-          className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+          className="border border-stone-400 bg-white px-3 py-2 text-xs text-stone-900"
         >
-          <option value="">All Categories</option>
+          <option value="">All Employer Types</option>
           {Object.entries(ORG_CATEGORIES).map(([k, v]) => (
             <option key={k} value={k}>
               {v}
@@ -96,64 +150,130 @@ export default async function OrgsPage({
         <select
           name="sector"
           defaultValue={sector}
-          className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+          className="border border-stone-400 bg-white px-3 py-2 text-xs text-stone-900"
         >
-          <option value="">All Sectors</option>
+          <option value="">All Policy Sectors</option>
           {Object.entries(SECTORS).map(([k, v]) => (
             <option key={k} value={k}>
               {v}
             </option>
           ))}
         </select>
-        <button
-          type="submit"
-          className="rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
-        >
-          Filter Directory
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="flex-1 bg-stone-900 px-4 py-2 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800"
+          >
+            Filter Atlas
+          </button>
+          {(category || sector || bg || q) && (
+            <Link
+              href="/orgs"
+              className="border border-stone-400 bg-white px-3 py-2 text-xs font-semibold text-stone-700 hover:border-stone-900"
+            >
+              Reset
+            </Link>
+          )}
+        </div>
       </form>
 
-      {/* Grid */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Master Employer Cards */}
+      <div className="grid gap-4 sm:grid-cols-2">
         {filtered.map((o) => {
           const jCount = jobCounts.get(o.id) ?? 0;
           const nCount = noteCounts.get(o.id) ?? 0;
+          const play = ORG_HIRING_PLAYBOOK[o.slug];
+
+          const channelBadge =
+            play?.hiringChannel ??
+            (jCount > 0 ? "Live ATS Board" : "Rolling / Direct Outreach");
+
+          const entryRoles =
+            play?.entryRoles ??
+            "Research Intern · Research Analyst / Associate (0–2 yrs)";
+          const lateralRoles =
+            play?.lateralRoles ??
+            "Senior Research Associate · Consultant / Programme Manager (3–10+ yrs)";
+          const howToApply =
+            play?.howToApplyWhenZeroListed ??
+            "Check official careers portal or send a 1-page CV + 2-page policy brief to the relevant research vertical lead.";
+          const applyUrl = play?.applyUrl || o.careersUrl || o.website || "#";
 
           return (
-            <Link
+            <div
               key={o.id}
-              href={`/orgs/${o.slug}`}
-              className="group flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-stone-400"
+              className="flex flex-col justify-between border border-stone-900 bg-[#FBF9F4] p-5"
             >
               <div>
-                <div className="flex items-center justify-between gap-2 text-[11px] text-stone-500">
-                  <span className="rounded-md bg-stone-100 px-2 py-0.5 font-semibold text-stone-700">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                  <span className="border border-stone-400 bg-[#EFECE3] px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-stone-800 uppercase">
                     {label(ORG_CATEGORIES, o.category)}
                   </span>
-                  {o.hq && (
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {o.hq}
+                  <div className="flex items-center gap-1.5">
+                    <span className="border border-stone-900 bg-stone-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
+                      {channelBadge}
                     </span>
-                  )}
+                    {o.hq && (
+                      <span className="font-mono-tabular inline-flex items-center gap-0.5 text-[10px] text-stone-600">
+                        <MapPin className="h-3 w-3" />
+                        {o.hq}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <h2 className="mt-2 flex items-center gap-1.5 text-base font-bold text-stone-900 group-hover:underline">
-                  <Building2 className="h-4 w-4 shrink-0 text-stone-500" />
-                  {o.name}
-                </h2>
+                <div className="mt-2.5 flex items-start justify-between gap-2">
+                  <Link
+                    href={`/orgs/${o.slug}`}
+                    className="font-serif-editorial flex items-center gap-1.5 text-xl font-normal text-stone-950 hover:underline"
+                  >
+                    <Building2 className="h-4 w-4 shrink-0 text-stone-600" />
+                    {o.name}
+                  </Link>
+                </div>
 
                 {o.description && (
-                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">
+                  <p className="mt-1 text-xs leading-relaxed text-stone-700">
                     {o.description}
                   </p>
                 )}
 
-                <div className="mt-2.5 flex flex-wrap gap-1">
+                {/* Entry & Lateral Roles Box */}
+                <div className="mt-3 space-y-1.5 border border-stone-300 bg-white p-3 text-xs">
+                  <div>
+                    <span className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+                      0–2 Yrs &amp; Intern Titles:{" "}
+                    </span>
+                    <span className="font-medium text-stone-900">{entryRoles}</span>
+                  </div>
+                  <div>
+                    <span className="font-mono-tabular text-[10px] font-bold text-stone-600 uppercase">
+                      3–10+ Yrs Lateral Titles:{" "}
+                    </span>
+                    <span className="text-stone-700">{lateralRoles}</span>
+                  </div>
+                  <div className="border-t border-stone-200 pt-1.5 text-[11px] leading-relaxed text-stone-600">
+                    <strong className="text-stone-900">How to Apply Today:</strong>{" "}
+                    {howToApply}
+                  </div>
+                </div>
+
+                {/* Best Fit Backgrounds & Sectors */}
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {(play?.bestFor ?? ["upsc_humanities", "econ_quant"]).map(
+                    (bId) => (
+                      <span
+                        key={bId}
+                        className="border border-amber-800/40 bg-amber-50/70 px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-amber-950"
+                      >
+                        Fit: {BG_SHORT[bId]}
+                      </span>
+                    ),
+                  )}
                   {o.sectors.slice(0, 3).map((s) => (
                     <span
                       key={s}
-                      className="rounded border border-stone-200 px-1.5 py-0.5 text-[10px] text-stone-600"
+                      className="border border-stone-300 bg-white px-1.5 py-0.5 font-mono-tabular text-[10px] text-stone-600"
                     >
                       {SECTORS[s as Sector] ?? s}
                     </span>
@@ -161,23 +281,60 @@ export default async function OrgsPage({
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-2.5 text-[11px] text-stone-600">
-                <div className="flex items-center gap-3">
-                  <span>
-                    <strong className="text-stone-900">{jCount}</strong> open
-                    role{jCount === 1 ? "" : "s"}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
+              {/* Action Footer */}
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-stone-300 pt-3 text-[11px]">
+                <div className="font-mono-tabular flex items-center gap-3 text-stone-700">
+                  <Link
+                    href={`/orgs/${o.slug}`}
+                    className="hover:underline"
+                  >
+                    <strong className="text-stone-950">{jCount}</strong> live
+                    listing{jCount === 1 ? "" : "s"}
+                  </Link>
+                  <Link
+                    href={`/orgs/${o.slug}`}
+                    className="inline-flex items-center gap-1 hover:underline"
+                  >
                     <MessageSquare className="h-3 w-3" />
-                    <strong className="text-stone-900">{nCount}</strong> batch
+                    <strong className="text-stone-950">{nCount}</strong> cohort
                     note{nCount === 1 ? "" : "s"}
-                  </span>
+                  </Link>
                 </div>
-                <span className="inline-flex items-center gap-0.5 font-semibold text-stone-900">
-                  Profile <ExternalLink className="h-3 w-3" />
-                </span>
+
+                <div className="flex items-center gap-2">
+                  <form action={addOrgTargetToTrackerAction}>
+                    <input type="hidden" name="orgId" value={o.id} />
+                    <input type="hidden" name="orgName" value={o.name} />
+                    <input
+                      type="hidden"
+                      name="title"
+                      value={entryRoles.split("·")[0].trim()}
+                    />
+                    <input type="hidden" name="url" value={applyUrl} />
+                    <input
+                      type="hidden"
+                      name="notes"
+                      value={`[${channelBadge}] ${howToApply}`}
+                    />
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-1 border border-stone-900 bg-white px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+                    >
+                      <Plus className="h-3 w-3" />+ Target Pipeline
+                    </button>
+                  </form>
+
+                  <a
+                    href={applyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 bg-stone-900 px-2.5 py-1 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase hover:bg-stone-800"
+                  >
+                    Careers Portal <ExternalLink className="h-2.5 w-2.5" />
+                  </a>
+                </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>

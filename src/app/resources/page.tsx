@@ -4,6 +4,7 @@ import { getUser, isModerator } from "@/lib/session";
 import { db, schema } from "@/db";
 import { desc } from "drizzle-orm";
 import { saveResourceAction } from "@/app/actions";
+import { PlacementPathfinder } from "@/components/placement-pathfinder";
 
 const CATEGORIES: Record<string, string> = {
   cv: "CV & Writing Samples",
@@ -128,6 +129,9 @@ export default async function ResourcesPage() {
           preparation protocol before you hit apply.
         </p>
       </div>
+
+      {/* Interactive Placement Pathfinder, CV Bullet Translator & 48-Hr Workbench */}
+      <PlacementPathfinder isSignedIn={Boolean(user)} />
 
       {/* Section 1: The 5-Track Industry Standards Matrix */}
       <section className="space-y-3">

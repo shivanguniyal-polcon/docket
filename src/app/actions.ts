@@ -832,3 +832,69 @@ export async function devQuickLoginAction(formData: FormData) {
 
   redirect(`/sign-in?prefill=${encodeURIComponent(email)}`);
 }
+
+/* -------------------------------------------------------------------------- */
+/*              Placement Pathfinder: Add Target Orgs to Tracker              */
+/* -------------------------------------------------------------------------- */
+
+export async function addOrgTargetToTrackerAction(formData: FormData) {
+  const user = await requireUser();
+  const orgName = String(formData.get("orgName") ?? "").trim();
+  const title =
+    String(formData.get("title") ?? "").trim() ||
+    "Research Analyst / Associate (Target Outreach)";
+  const url = String(formData.get("url") ?? "").trim() || null;
+  const notes = String(formData.get("notes") ?? "").trim() || null;
+  const orgId = String(formData.get("orgId") ?? "").trim() || null;
+
+  if (!orgName) return;
+
+  await db.insert(schema.application).values({
+    userId: user.id,
+    orgId,
+    orgName,
+    title,
+    url,
+    type: "full_time",
+    status: "saved",
+    notes,
+  });
+
+  revalidatePath("/tracker");
+  revalidatePath("/orgs");
+}
+
+export async function bulkAddTargetsToTrackerAction(
+  targets: Array<{
+    orgName: string;
+    title: string;
+    url: string;
+    notes: string;
+  }>,
+) {
+  const user = await requireUser();
+  const existing = await db
+    .select({ orgName: schema.application.orgName })
+    .from(schema.application)
+    .where(eq(schema.application.userId, user.id));
+  const existingOrgs = new Set(existing.map((e) => e.orgName.toLowerCase()));
+
+  let added = 0;
+  for (const t of targets) {
+    if (existingOrgs.has(t.orgName.toLowerCase())) continue;
+    await db.insert(schema.application).values({
+      userId: user.id,
+      orgName: t.orgName,
+      title: t.title,
+      url: t.url,
+      type: "full_time",
+      status: "saved",
+      notes: t.notes,
+    });
+    existingOrgs.add(t.orgName.toLowerCase());
+    added++;
+  }
+
+  revalidatePath("/tracker");
+  return { added };
+}

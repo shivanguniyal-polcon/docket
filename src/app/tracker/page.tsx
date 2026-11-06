@@ -55,26 +55,134 @@ export default async function TrackerPage() {
     grouped.get(key)!.push(a);
   }
 
+  // Compute Portfolio Balance & Placement Readiness metrics
+  const totalTracked = apps.length;
+  const activeSubmittedCount =
+    (grouped.get("applied")?.length ?? 0) +
+    (grouped.get("interviewing")?.length ?? 0) +
+    (grouped.get("offer")?.length ?? 0);
+  const withFollowUp = apps.filter((a) => Boolean(a.nextFollowUp)).length;
+  const withWritingSample = apps.filter((a) => Boolean(a.writingSample)).length;
+
+  const consultingCount = apps.filter((a) =>
+    /samagra|dalberg|pwc|ey|deloitte|sattva|microsave|bga|bower|athena|mckinsey|bcg/i.test(
+      a.orgName,
+    ),
+  ).length;
+  const thinkTankOrSafetyCount = apps.filter((a) =>
+    /ceew|prs|csep|icrier|nipfp|vidhi|esya|koan|graam|pravi|nfprc|crisp|niti|swaniti|orf|cpr/i.test(
+      a.orgName,
+    ),
+  ).length;
+
+  const portfolioWarnings: string[] = [];
+  if (totalTracked < 12) {
+    portfolioWarnings.push(
+      `Your pipeline has ${totalTracked}/15 recommended target organizations. Successful MPP candidates track at least 15–20 organizations across 3 tiers.`,
+    );
+  }
+  if (consultingCount > 0 && thinkTankOrSafetyCount < 2) {
+    portfolioWarnings.push(
+      "High Concentration Risk: Your pipeline is heavy on selective consulting firms with fewer than 2 Think-Tank / Rolling Portal safety nets.",
+    );
+  }
+  if (activeSubmittedCount > 0 && withFollowUp === 0) {
+    portfolioWarnings.push(
+      "Zero follow-up dates scheduled: Set a 7-day follow-up date on your applied cards so cold emails and applications don't go cold.",
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b-2 border-stone-900 pb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">
-            My Application Tracker
+          <div className="font-mono-tabular text-[11px] font-bold tracking-widest text-amber-900 uppercase">
+            § 02 · PERSONAL PLACEMENT LEDGER &amp; PORTFOLIO RADAR
+          </div>
+          <h1 className="font-serif-editorial mt-1 text-3xl font-normal tracking-tight text-stone-950">
+            My Application Tracker &amp; Safety-Net Diagnostic
           </h1>
-          <p className="text-xs text-stone-600">
-            Track every application, deadline, contact &amp; interview note.
-            Email reminders fire 7 days and 1 day before deadlines.
+          <p className="mt-1 text-xs text-stone-700">
+            Track every target organization, CV version, writing sample &amp;
+            7-day follow-up date. Automated email reminders fire 7 days and 1
+            day before deadlines.
           </p>
         </div>
 
-        <a
-          href="/api/calendar.ics"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-50"
-        >
-          <Calendar className="h-3.5 w-3.5" />
-          Export Deadlines (.ics)
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/resources"
+            className="border border-stone-900 bg-stone-900 px-3.5 py-2 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800"
+          >
+            Auto-Generate 20-Org Target List →
+          </Link>
+          <a
+            href="/api/calendar.ics"
+            className="inline-flex items-center gap-1.5 border border-stone-900 bg-[#FBF9F4] px-3.5 py-2 text-xs font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            Export Deadlines (.ics)
+          </a>
+        </div>
+      </div>
+
+      {/* Placement Coverage & Portfolio Risk Radar */}
+      <div className="border-2 border-stone-900 bg-[#FBF9F4] p-5">
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:col-span-7">
+            <div className="border border-stone-300 bg-white p-3">
+              <div className="font-mono-tabular text-[10px] font-bold text-stone-500 uppercase">
+                Total Pipeline Targets
+              </div>
+              <div className="font-mono-tabular mt-1 text-2xl font-bold text-stone-950">
+                {totalTracked}{" "}
+                <span className="text-xs font-normal text-stone-500">/ 15 goal</span>
+              </div>
+            </div>
+            <div className="border border-stone-300 bg-white p-3">
+              <div className="font-mono-tabular text-[10px] font-bold text-stone-500 uppercase">
+                Applied / Interviewing
+              </div>
+              <div className="font-mono-tabular mt-1 text-2xl font-bold text-stone-950">
+                {activeSubmittedCount}
+              </div>
+            </div>
+            <div className="border border-stone-300 bg-white p-3">
+              <div className="font-mono-tabular text-[10px] font-bold text-stone-500 uppercase">
+                Think Tank &amp; Rolling Nets
+              </div>
+              <div className="font-mono-tabular mt-1 text-2xl font-bold text-emerald-900">
+                {thinkTankOrSafetyCount}
+              </div>
+            </div>
+            <div className="border border-stone-300 bg-white p-3">
+              <div className="font-mono-tabular text-[10px] font-bold text-stone-500 uppercase">
+                Writing Sample Logged
+              </div>
+              <div className="font-mono-tabular mt-1 text-2xl font-bold text-amber-900">
+                {withWritingSample}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center border-t border-stone-300 pt-3 lg:col-span-5 lg:border-t-0 lg:border-l lg:pl-5 lg:pt-0">
+            <div className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+              PORTFOLIO BALANCE DIAGNOSTIC
+            </div>
+            {portfolioWarnings.length === 0 ? (
+              <p className="mt-1 text-xs font-semibold text-emerald-900">
+                ✓ Your placement pipeline is well-balanced across reach consulting,
+                core think tanks, and rolling safety-net institutions.
+              </p>
+            ) : (
+              <ul className="mt-1 space-y-1 text-xs leading-relaxed text-stone-800">
+                {portfolioWarnings.map((w, idx) => (
+                  <li key={idx}>• {w}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Add off-platform / custom application */}

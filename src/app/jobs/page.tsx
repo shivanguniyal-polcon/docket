@@ -23,6 +23,7 @@ import {
 } from "@/lib/taxonomy";
 import { trackJobAction, flagNonPolicyJobAction } from "@/app/actions";
 import { FitScoreWidget } from "@/components/fit-score-widget";
+import { MONTHLY_ACTION_WINDOWS } from "@/lib/placement-intelligence";
 
 interface SearchParams {
   q?: string;
@@ -137,14 +138,72 @@ export default async function JobsPage({
             Active Openings &amp; Fellowships ({jobs.length})
           </h1>
         </div>
-        <Link
-          href="/submit"
-          className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Log URL or WhatsApp Forward
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/resources"
+            className="inline-flex items-center gap-1.5 border border-stone-900 bg-[#FBF9F4] px-3.5 py-2 text-xs font-bold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+          >
+            Where Should I Apply? Matcher →
+          </Link>
+          <Link
+            href="/submit"
+            className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Log URL or WhatsApp Forward
+          </Link>
+        </div>
       </div>
+
+      {/* Actionable Monthly Statutory & Rolling Windows Strip */}
+      <details className="border-2 border-stone-900 bg-[#EFECE3]" open>
+        <summary className="flex cursor-pointer items-center justify-between px-4 py-2.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="bg-amber-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
+              NEVER MISS A WINDOW
+            </span>
+            <span className="font-mono-tabular text-xs font-bold text-stone-950 uppercase">
+              Monthly Statutory &amp; Rolling Portals Open Right Now (NITI Aayog 1st–10th, CCI, DPIIT, MEA, LAMP, Vidhi)
+            </span>
+          </div>
+          <span className="font-mono-tabular text-[10px] font-semibold text-stone-600 uppercase">
+            Toggle [–/+]
+          </span>
+        </summary>
+        <div className="grid gap-2.5 border-t border-stone-900 bg-[#FBF9F4] p-4 sm:grid-cols-2 lg:grid-cols-3">
+          {MONTHLY_ACTION_WINDOWS.map((mw) => (
+            <div
+              key={mw.title}
+              className="flex flex-col justify-between border border-stone-300 bg-white p-3"
+            >
+              <div>
+                <div className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+                  {mw.windowLabel}
+                </div>
+                <div className="mt-0.5 text-xs font-bold text-stone-950">
+                  {mw.title}
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-stone-600">
+                  {mw.actionNote}
+                </p>
+              </div>
+              <div className="mt-2 flex items-center justify-between border-t border-stone-200 pt-2">
+                <span className="font-mono-tabular text-[10px] font-semibold text-stone-700">
+                  {mw.organization}
+                </span>
+                <a
+                  href={mw.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 font-mono-tabular text-[10px] font-bold text-stone-950 underline"
+                >
+                  Official Portal <ArrowUpRight className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </details>
 
       {params.submitted && (
         <div className="border border-stone-900 bg-emerald-950 px-4 py-3 font-mono-tabular text-xs text-[#F6F3EC]">

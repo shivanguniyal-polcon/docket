@@ -570,6 +570,147 @@ async function runBootstrapOnce() {
       })
       .onConflictDoNothing();
   }
+
+  // Seed starter career guides & institutional memory notes
+  const starterGuides = [
+    {
+      slug: "indian-policy-cv-playbook",
+      title: "The IITD MPP Policy CV Playbook (Think Tanks, Consulting & Multilaterals)",
+      category: "cv",
+      body: `1. Keep it to 1 page for 0–5 years experience (2 pages only for academic/RA roles or 5+ years).
+2. Structure for MPP candidates:
+   • Education & Policy Coursework (highlight Econometrics, Policy Evaluation, Law & Governance, Capstone/Thesis topic)
+   • Policy & Research Experience (quantify scope: e.g. "Analyzed 14 state ERC tariff orders", "Cleaned NSSO 78th round dataset of 42,000 households in R")
+   • Fieldwork & Stakeholder Engagement (mention districts, ministry consultations, or primary surveys)
+   • Technical & Policy Toolkit (R / Stata / Python / QGIS / Legislative Drafting / Budget Analysis)
+3. Tailor verbs by target:
+   • Think Tanks (CEEW, CPR, PRS, CSEP, Vidhi): emphasize empirical rigor, writing samples, datasets, and legislative/regulatory citations.
+   • Governance Consulting (Samagra, Dalberg, PwC, EY, Deloitte, MSC): emphasize PMU delivery, state department stakeholders, dashboards, and scale impact.`,
+    },
+    {
+      slug: "writing-samples-and-policy-memos",
+      title: "Acing Take-Home Policy Memos & Written Assignments (48-Hour Tasks)",
+      category: "interview",
+      body: `Almost every Indian policy employer (CEEW, Samagra, IDinsight, J-PAL, Koan, Esya) uses a take-home written assignment or data test in Round 1.
+
+• Executive Summary First (BLUF): Put your 3 core recommendations and the trade-offs in the first 150 words.
+• Ground in Indian Institutional Reality: Name the exact nodal ministry, statutory regulator (TRAI, SEBI, CERC, RBI), scheme budget head, and 73rd/74th Amendment or Union/Concurrent List constraints.
+• Data Tests (IDinsight / J-PAL / CEEW): Always submit a clean, commented .do or .R script alongside your summary PDF. State your handling of missing values, outliers, and survey weights explicitly.`,
+    },
+    {
+      slug: "cover-letters-that-get-read",
+      title: "3-Paragraph Cover Note Formula for Policy Roles & Cold Outreach",
+      category: "cover_letter",
+      body: `Paragraph 1 — The Hook & Specific Project:
+Name the exact vertical or recent report by the organization (e.g. "I am writing to apply for the Programme Associate role in CEEW's Industrial Sustainability team, following your recent study on green steel procurement...").
+
+Paragraph 2 — Your Proof of Work:
+Connect 1 quantitative skill + 1 policy domain experience from your IITD MPP coursework, internship, or thesis directly to the JD's deliverables.
+
+Paragraph 3 — Availability & Writing Sample:
+State your earliest start window (e.g. "Available for winter internship from Dec 2, 2026" or "Graduating May 2027") and attach a 2-page policy brief link.`,
+    },
+    {
+      slug: "moderator-annual-handoff-checklist",
+      title: "Annual Batch Hand-Off Checklist (Maintaining Docket Across Cohorts)",
+      category: "guide",
+      body: `Every April/May, outgoing 2nd-year student moderators hand over operational stewardship to incoming 1st-year leads:
+
+1. Role Promotion: The permanent Owner promotes 2–3 incoming student leads to "moderator" in the Mod Console (/admin) and transitions graduating members to "alumni".
+2. Alumni Continuity Check: Remind graduating batchmates to verify their personal Gmail/Outlook in /settings before their @iitd.ac.in inbox deactivates, and invite them to opt into the Alumni Referral Directory.
+3. Post-Placement Memory Drive: Host a 30-minute cohort session after summer internships and final placements where everyone logs 1 anonymous interview note on /orgs and updates their Tracker status to power the n >= 5 outcome funnel.`,
+    },
+  ];
+
+  for (const g of starterGuides) {
+    await db
+      .insert(schema.resource)
+      .values({
+        slug: g.slug,
+        title: g.title,
+        category: g.category,
+        body: g.body,
+        authorId: "usr_owner_ganesh",
+      })
+      .onConflictDoNothing({ target: schema.resource.slug });
+  }
+
+  const ceewId = slugToOrgId.get("ceew");
+  const samagraId = slugToOrgId.get("samagra");
+  const prsId = slugToOrgId.get("prs-legislative-research");
+
+  if (ceewId) {
+    await db.insert(schema.orgNote).values([
+      {
+        orgId: ceewId,
+        userId: "usr_mod_ananya",
+        batch: "MPP 2025–27",
+        anonymous: false,
+        kind: "assignment_prompt",
+        roleTitle: "Research Analyst — Power & Renewables",
+        compensation: "₹9.5–11.5 LPA (Analyst) · ₹20k/mo (Intern)",
+        assignmentTimeLimit: "48 hours",
+        assignmentTools: "Excel / R + 2-page policy memo",
+        body: "CEEW hiring has 3 stages: (1) Shortlisting + 48-hour written/quant assignment specific to the team (e.g. power sector tariff analysis in Excel/R), (2) Technical interview with the Programme Lead + Senior Analyst (expect deep questions on your MPP thesis/capstone), and (3) Culture & leadership round with HR/Director.",
+      },
+      {
+        orgId: ceewId,
+        userId: "usr_alum_kabir",
+        batch: "MPP 2022–24",
+        anonymous: true,
+        kind: "timeline",
+        roleTitle: "Winter / Summer Research Intern",
+        compensation: "₹20,000/month",
+        body: "Winter internship calls usually go out in November; summer internship & Research Analyst calls open in February–March. Applying within the first 7 days of posting significantly helps.",
+      },
+    ]);
+
+    const statuses = ["offer", "interviewing", "interviewing", "applied", "rejected"];
+    for (let i = 0; i < 5; i++) {
+      await db.insert(schema.application).values({
+        userId: personas[i].id,
+        orgId: ceewId,
+        title: "Research Intern / Analyst — Energy Transition",
+        orgName: "Council on Energy, Environment and Water (CEEW)",
+        url: "https://ceew.zohorecruit.in/jobs/Careers",
+        type: i < 2 ? "internship" : "full_time",
+        status: statuses[i],
+        deadline: "2026-12-05",
+        appliedAt: "2026-11-02",
+        shareOutcome: true,
+      });
+    }
+  }
+
+  if (samagraId) {
+    await db.insert(schema.orgNote).values({
+      orgId: samagraId,
+      userId: "usr_alum_meera",
+      batch: "MPP 2023–25",
+      anonymous: false,
+      kind: "assignment_prompt",
+      roleTitle: "Associate — Governance Consulting",
+      compensation: "₹14.5–17.5 LPA",
+      assignmentTimeLimit: "48 hours",
+      assignmentTools: "6-slide PowerPoint Deck + Issue Tree",
+      body: "Samagra Associate process: Deck submission on a governance problem statement → Guesstimate + Governance Case Round (e.g. improving foundational literacy in a state) → Partner chat. Emphasize structured problem-solving and comfort with field travel.",
+    });
+  }
+
+  if (prsId) {
+    await db.insert(schema.orgNote).values({
+      orgId: prsId,
+      userId: "usr_alum_kabir",
+      batch: "MPP 2022–24",
+      anonymous: false,
+      kind: "tip",
+      roleTitle: "LAMP Fellow",
+      compensation: "₹23,000/month stipend",
+      assignmentTimeLimit: "2 x 500-word essays",
+      assignmentTools: "Policy Problem Essay + Book/Bill Critique",
+      body: "For LAMP Fellowship: the two 500-word essays (one policy problem, one book/article critique) carry huge weight. Keep your stance strictly non-partisan and analytical — PRS values neutral briefings that any MP across the aisle can use.",
+    });
+  }
 }
 
 export async function ensureDbReady() {

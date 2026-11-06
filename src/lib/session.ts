@@ -3,10 +3,12 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { ensureDbReady } from "@/db/auto-bootstrap";
 import type { Role } from "@/lib/taxonomy";
 
 /** Current session (deduped per request). */
 export const getSession = cache(async () => {
+  await ensureDbReady();
   return auth.api.getSession({ headers: await headers() });
 });
 

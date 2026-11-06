@@ -30,6 +30,16 @@ function cleanText(text: string): string {
     .trim();
 }
 
+export function htmlToCleanText(htmlStr: string): string {
+  if (!htmlStr) return "";
+  const withBreaks = htmlStr
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6]|tr|blockquote)>/gi, "\n\n")
+    .replace(/<li[^>]*>/gi, "• ");
+  const $ = cheerio.load(withBreaks);
+  return cleanText($.text());
+}
+
 /**
  * Fetches a live job URL and extracts its actual Job Description (JD) and
  * structured metadata using:
@@ -65,8 +75,7 @@ export async function extractJobFromUrl(rawUrl: string): Promise<ExtractedJD> {
           };
         };
         const info = data.jobPostingInfo ?? {};
-        const $ = cheerio.load(info.jobDescription ?? "");
-        const desc = cleanText($.text()).slice(0, 8000);
+        const desc = htmlToCleanText(info.jobDescription ?? "").slice(0, 8000);
         const title = info.title ?? "Policy Opening";
         const orgName = tenant.toUpperCase();
         const location = info.location ?? "India";
@@ -142,8 +151,7 @@ export async function extractJobFromUrl(rawUrl: string): Promise<ExtractedJD> {
             deadline = String(item.validThrough).slice(0, 10);
           }
           if (item.description && !description) {
-            const descDom = cheerio.load(String(item.description));
-            description = cleanText(descDom.text());
+            description = htmlToCleanText(String(item.description));
           }
         }
       }

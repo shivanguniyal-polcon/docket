@@ -37,6 +37,7 @@ import {
 } from "@/app/actions";
 import { SubmitButton } from "@/components/loading-button";
 import { FitScoreWidget } from "@/components/fit-score-widget";
+import { StructuredJobDescription } from "@/components/structured-job-description";
 import { ORG_HIRING_PLAYBOOK } from "@/lib/placement-intelligence";
 
 export default async function JobDetailPage({
@@ -418,28 +419,13 @@ export default async function JobDetailPage({
           </div>
         )}
 
-        {/* Description */}
-        <div className="mt-6 border-t border-stone-200 pt-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-stone-900">
-              Official Job Description (Extracted from Posting URL)
-            </h2>
-            <form action={refreshJobJDAction}>
-              <input type="hidden" name="jobId" value={jobRow.id} />
-              <SubmitButton
-                pendingText="Extracting JD…"
-                icon={<RefreshCw className="h-3 w-3" />}
-                className="rounded-lg border border-stone-300 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 hover:bg-stone-50"
-              >
-                Live-extract / refresh full JD from URL
-              </SubmitButton>
-            </form>
-          </div>
-          <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-700">
-            {jobRow.description ||
-              "Click 'Live-extract / refresh full JD from URL' above to pull the full text from the official posting, or open the official application link."}
-          </div>
-        </div>
+        {/* Structured Official Job Description */}
+        <StructuredJobDescription
+          jobId={jobRow.id}
+          description={jobRow.description}
+          officialUrl={jobRow.url}
+          refreshAction={refreshJobJDAction}
+        />
       </div>
 
       {/* Cohort notes on this organization */}

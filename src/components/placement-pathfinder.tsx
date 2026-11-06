@@ -181,10 +181,20 @@ function auditMemo(
   };
 }
 
-export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
+export function PlacementPathfinder({
+  isSignedIn,
+  initialTab = "matcher",
+}: {
+  isSignedIn: boolean;
+  initialTab?: string;
+}) {
   const [activeTab, setActiveTab] = useState<
     "matcher" | "translator" | "workbench"
-  >("matcher");
+  >(
+    initialTab === "workbench" || initialTab === "translator"
+      ? initialTab
+      : "matcher",
+  );
 
   // Tab 1: Matcher state
   const [selectedBg, setSelectedBg] = useState<BackgroundId>("upsc_humanities");

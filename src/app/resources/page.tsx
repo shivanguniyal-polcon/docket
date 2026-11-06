@@ -104,7 +104,12 @@ const PRE_APPLY_CHECKLIST = [
   "Did you log the CV version, writing sample attached, and a 7-day follow-up date in your Docket Ledger (/tracker)?",
 ];
 
-export default async function ResourcesPage() {
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ tab?: string }>;
+}) {
+  const params = await (searchParams ?? Promise.resolve({}));
   const user = await getUser();
   const resources = await db
     .select()
@@ -131,7 +136,10 @@ export default async function ResourcesPage() {
       </div>
 
       {/* Interactive Placement Pathfinder, CV Bullet Translator & 48-Hr Workbench */}
-      <PlacementPathfinder isSignedIn={Boolean(user)} />
+      <PlacementPathfinder
+        isSignedIn={Boolean(user)}
+        initialTab={params?.tab}
+      />
 
       {/* Section 1: The 5-Track Industry Standards Matrix */}
       <section className="space-y-3">

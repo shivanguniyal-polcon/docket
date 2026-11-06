@@ -20,6 +20,7 @@ import {
   triggerSourceRunAction,
 } from "@/app/actions";
 import { SubmitButton } from "@/components/loading-button";
+import { AdminWebSearch } from "@/components/admin-web-search";
 
 export default async function AdminPage() {
   const mod = await requireModerator();
@@ -96,15 +97,18 @@ export default async function AdminPage() {
           <form action={triggerSourceRunAction}>
             <input type="hidden" name="sourceId" value="ALL" />
             <SubmitButton
-              pendingText="Scanning ATS…"
+              pendingText="Scanning ATS & Web…"
               icon={<RefreshCw className="h-3.5 w-3.5" />}
               className="border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-semibold text-[#F6F3EC] uppercase hover:bg-stone-800"
             >
-              Run Live ATS Scan
+              Run Live ATS &amp; Web Scraper
             </SubmitButton>
           </form>
         </div>
       </div>
+
+      {/* 0. Live Web & Noticeboard Discovery Engine */}
+      <AdminWebSearch />
 
       {/* 1. Pending Job Submissions / Scraped Queue */}
       <section className="rounded-2xl border border-stone-200 bg-white p-6">

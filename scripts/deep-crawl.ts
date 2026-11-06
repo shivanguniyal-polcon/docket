@@ -708,7 +708,9 @@ async function crawlSearchDorks(orgs: SeedOrg[]): Promise<CrawledJobRecord[]> {
   const dorkQueries = [
     'site:keka.com "Public Policy" OR "Research Associate" OR "Government Advisory" India',
     'site:careers-page.com "Foundation" OR "Policy" OR "Governance" India',
-    '"Research Associate" "Public Policy" ("ISB" OR "IIM" OR "NIPFP" OR "IGIDR" OR "CSEP") apply',
+    '"Research Associate" "Public Policy" ("ISB" OR "IIM" OR "NIPFP" OR "IGIDR" OR "CPR" OR "CSEP") apply',
+    '"Young Professional" OR "Consultant" ("NITI Aayog" OR "Public Policy" OR "State Transformation") India last date',
+    'site:devnetjobsindia.org "policy" OR "governance" OR "M&E"',
   ];
 
   const defaultOrg = orgs.find((o) => o.slug === "csep") ?? orgs[0];
@@ -727,7 +729,7 @@ async function crawlSearchDorks(orgs: SeedOrg[]): Promise<CrawledJobRecord[]> {
             "X-API-KEY": process.env.SERPER_API_KEY,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ q, gl: "in", num: 10 }),
+          body: JSON.stringify({ q, gl: "in", num: 15 }),
         });
         for (const item of data.organic ?? []) {
           results.push({
@@ -737,25 +739,24 @@ async function crawlSearchDorks(orgs: SeedOrg[]): Promise<CrawledJobRecord[]> {
           });
         }
       } else {
-        // Zero-key fallback: Throttled Yahoo India Search Dork
+        // Zero-key fallback: Throttled Search Dork
         await sleep(600);
         const html = await fetchHtml(
-          `https://in.search.yahoo.com/search?p=${encodeURIComponent(q)}`,
+          `https://search.yahoo.com/search?p=${encodeURIComponent(q)}`,
         );
         const $ = cheerio.load(html);
-        $(".compTitle a").slice(0, 6).each((_, el) => {
-          const rawTitle = $(el).text().replace(/\s+/g, " ").trim();
-          const rawHref = $(el).attr("href") ?? "";
+        $(".algo").slice(0, 10).each((_, el) => {
+          const rawHref = $(el).find("a").first().attr("href") ?? "";
           const m = rawHref.match(/\/RU=([^/]+)\//);
           const decodedUrl = m ? decodeURIComponent(m[1]) : rawHref;
+          const rawTitle = $(el).find("h3 a, .compTitle").first().text().replace(/\s+/g, " ").trim();
           const snippet = $(el)
-            .closest(".algo")
             .find(".compText")
             .text()
             .replace(/\s+/g, " ")
             .trim();
-          if (decodedUrl.startsWith("http")) {
-            results.push({ title: rawTitle, url: decodedUrl, snippet });
+          if (decodedUrl.startsWith("http") && !decodedUrl.includes("yahoo.com")) {
+            results.push({ title: rawTitle || "Policy Opportunity", url: decodedUrl, snippet });
           }
         });
       }

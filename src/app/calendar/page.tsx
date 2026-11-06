@@ -41,6 +41,27 @@ function isMonthInWindow(
   return month >= openMonth || month <= close;
 }
 
+function formatDaysLeft(deadlineStr: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(deadlineStr);
+  target.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(
+    (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  if (diffDays < 0) return { text: "Closed", className: "bg-stone-100 text-stone-500" };
+  if (diffDays === 0)
+    return { text: "Due Today!", className: "bg-rose-100 text-rose-950 font-bold" };
+  if (diffDays === 1)
+    return { text: "Due Tomorrow", className: "bg-rose-100 text-rose-950 font-bold" };
+  if (diffDays <= 7)
+    return {
+      text: `Due in ${diffDays}d (${deadlineStr})`,
+      className: "bg-amber-100 text-amber-950 font-semibold",
+    };
+  return { text: deadlineStr, className: "bg-stone-100 text-stone-800" };
+}
+
 export default async function CalendarPage() {
   await ensureDbReady();
   const user = await getUser();
@@ -172,9 +193,16 @@ export default async function CalendarPage() {
                       <span className="font-medium">{a.status}</span>
                     </div>
                   </div>
-                  <span className="rounded-lg bg-amber-50 px-2.5 py-1 font-semibold text-amber-900">
-                    {a.deadline}
-                  </span>
+                  {(() => {
+                    const days = formatDaysLeft(a.deadline!);
+                    return (
+                      <span
+                        className={`rounded-lg px-2.5 py-1 text-[11px] ${days.className}`}
+                      >
+                        {days.text}
+                      </span>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
@@ -192,26 +220,31 @@ export default async function CalendarPage() {
             </p>
           ) : (
             <div className="mt-3 divide-y divide-stone-100">
-              {openDeadlines.slice(0, 10).map((j) => (
-                <div
-                  key={j.id}
-                  className="flex items-center justify-between py-2.5 text-xs"
-                >
-                  <div>
-                    <Link
-                      href={`/jobs/${j.id}`}
-                      prefetch={false}
-                      className="font-semibold text-stone-900 hover:underline"
+              {openDeadlines.slice(0, 10).map((j) => {
+                const days = formatDaysLeft(j.deadline!);
+                return (
+                  <div
+                    key={j.id}
+                    className="flex items-center justify-between py-2.5 text-xs"
+                  >
+                    <div>
+                      <Link
+                        href={`/jobs/${j.id}`}
+                        prefetch={false}
+                        className="font-semibold text-stone-900 hover:underline"
+                      >
+                        {j.title}
+                      </Link>
+                      <div className="text-stone-500">{j.orgName}</div>
+                    </div>
+                    <span
+                      className={`rounded-lg px-2.5 py-1 text-[11px] ${days.className}`}
                     >
-                      {j.title}
-                    </Link>
-                    <div className="text-stone-500">{j.orgName}</div>
+                      {days.text}
+                    </span>
                   </div>
-                  <span className="rounded-lg bg-stone-100 px-2.5 py-1 font-semibold text-stone-800">
-                    {j.deadline}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

@@ -263,7 +263,14 @@ export function PlacementPathfinder({ isSignedIn }: { isSignedIn: boolean }) {
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="space-y-2 pt-2">
+                <a
+                  href={`/jobs?archetype=${selectedBg}`}
+                  className="inline-flex w-full items-center justify-center gap-1.5 border border-stone-900 bg-[#FBF9F4] px-4 py-2 text-xs font-bold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  View Live Openings for {profile.shortLabel} on Feed →
+                </a>
                 <button
                   type="button"
                   disabled={isPending || matchedOrgs.length === 0}

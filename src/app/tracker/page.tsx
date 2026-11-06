@@ -260,20 +260,53 @@ export default async function TrackerPage() {
 
       {/* Kanban Board */}
       {apps.length === 0 ? (
-        <div className="rounded-2xl border border-stone-200 bg-white p-10 text-center">
-          <p className="text-sm font-medium text-stone-800">
-            Your application board is empty.
-          </p>
-          <p className="mt-1 text-xs text-stone-500">
-            Save roles from the live feed or add a custom application above.
-          </p>
-          <Link
-            href="/jobs"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
-          >
-            Browse Live Job Feed
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+        <div className="border-2 border-stone-900 bg-[#FBF9F4] p-8">
+          <div className="max-w-2xl">
+            <span className="bg-amber-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
+              STARTER SAFETY NET
+            </span>
+            <h2 className="font-serif-editorial mt-2 text-2xl text-stone-950">
+              Your Placement Board is Empty — Start With 5 Guaranteed Rolling Portals
+            </h2>
+            <p className="mt-1 text-xs text-stone-700 leading-relaxed">
+              Don&apos;t wait for off-campus cold calls. Every successful MPP student keeps at least 5 always-open government and think-tank rolling portals in their pipeline:
+            </p>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { name: "NITI Aayog", role: "Policy & Research Intern", note: "Opens 1st–10th every month. Zero fee." },
+              { name: "PRS Legislative Research", role: "LAMP / Legislative Research Intern", note: "Essential parliamentary research portfolio item." },
+              { name: "Competition Commission of India (CCI)", role: "Economics & Law Intern", note: "Opens 1st of every month with stipends." },
+              { name: "CEEW", role: "Clean Energy Transition Intern", note: "India's premier climate policy think tank." },
+              { name: "Invest India", role: "Strategic Investment Research Intern", note: "National investment promotion PMU." },
+            ].map((safety) => (
+              <div key={safety.name} className="border border-stone-300 bg-white p-3">
+                <div className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+                  {safety.name}
+                </div>
+                <div className="mt-0.5 text-xs font-bold text-stone-950">
+                  {safety.role}
+                </div>
+                <p className="mt-1 text-[11px] text-stone-600">{safety.note}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Link
+              href="/resources"
+              className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2.5 text-xs font-bold tracking-wider text-[#FBF9F4] uppercase hover:bg-stone-800"
+            >
+              Generate Tailored 20-Org List for My Background →
+            </Link>
+            <Link
+              href="/jobs"
+              className="inline-flex items-center gap-1.5 border border-stone-900 bg-white px-4 py-2.5 text-xs font-bold text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
+            >
+              Browse 244 Verified Mandates →
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -372,6 +405,77 @@ export default async function TrackerPage() {
                           <p className="mt-2 rounded-lg bg-stone-50 p-2 text-xs text-stone-700">
                             {a.notes}
                           </p>
+                        )}
+
+                        {/* Heard Back Pulse for Applied roles */}
+                        {a.status === "applied" && (
+                          <div className="mt-2.5 rounded-lg border border-amber-300 bg-amber-50/80 p-2 text-[10px]">
+                            <div className="font-bold text-amber-950">
+                              Heard back from {a.orgName}?
+                            </div>
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                              <form action={moveApplicationStatusAction}>
+                                <input type="hidden" name="id" value={a.id} />
+                                <input
+                                  type="hidden"
+                                  name="status"
+                                  value="interviewing"
+                                />
+                                <button
+                                  type="submit"
+                                  className="rounded bg-emerald-800 px-2 py-0.5 font-bold text-white hover:bg-emerald-700"
+                                >
+                                  ✓ Interview / Assignment
+                                </button>
+                              </form>
+                              <form action={moveApplicationStatusAction}>
+                                <input type="hidden" name="id" value={a.id} />
+                                <input
+                                  type="hidden"
+                                  name="status"
+                                  value="withdrawn"
+                                />
+                                <button
+                                  type="submit"
+                                  className="rounded border border-stone-300 bg-white px-2 py-0.5 text-stone-700 hover:bg-stone-100"
+                                >
+                                  Ghosted (14+ d)
+                                </button>
+                              </form>
+                              <form action={moveApplicationStatusAction}>
+                                <input type="hidden" name="id" value={a.id} />
+                                <input
+                                  type="hidden"
+                                  name="status"
+                                  value="rejected"
+                                />
+                                <button
+                                  type="submit"
+                                  className="rounded border border-rose-300 bg-rose-50 px-2 py-0.5 text-rose-800 hover:bg-rose-100"
+                                >
+                                  Rejected
+                                </button>
+                              </form>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Momentum Booster for Rejected roles */}
+                        {a.status === "rejected" && (
+                          <div className="mt-2.5 rounded-lg border border-rose-200 bg-rose-50/70 p-2 text-[10px]">
+                            <div className="font-bold text-rose-950">
+                              Keep Momentum:
+                            </div>
+                            <p className="mt-0.5 text-stone-600">
+                              Rejections are standard in policy placement. Keep 15+ active targets.
+                            </p>
+                            <Link
+                              href="/jobs"
+                              className="mt-1 inline-block font-semibold text-stone-900 underline"
+                            >
+                              Browse similar open roles on Docket feed →
+                            </Link>
+                          </div>
                         )}
 
                         {/* Quick status move */}

@@ -311,6 +311,20 @@ export async function flagNonPolicyJobAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function reportClosedJobAction(formData: FormData) {
+  const jobId = String(formData.get("jobId") ?? "").trim();
+  if (!jobId) return;
+
+  await db
+    .update(schema.job)
+    .set({ status: "expired", updatedAt: new Date() })
+    .where(eq(schema.job.id, jobId));
+
+  revalidatePath("/jobs");
+  revalidatePath(`/jobs/${jobId}`);
+  redirect("/jobs?reported=closed");
+}
+
 export async function reviewJobAction(formData: FormData) {
   const mod = await requireModerator();
   const jobId = String(formData.get("jobId") ?? "");

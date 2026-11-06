@@ -11,11 +11,13 @@ import {
   RefreshCw,
   Users,
   Send,
+  Share2,
+  AlertCircle,
 } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { ensureDbReady } from "@/db/auto-bootstrap";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne, or, sql } from "drizzle-orm";
 import {
   EXPERIENCE,
   JOB_TYPES,
@@ -31,6 +33,7 @@ import {
   trackJobAction,
   refreshJobJDAction,
   requestReferralAction,
+  reportClosedJobAction,
 } from "@/app/actions";
 import { FitScoreWidget } from "@/components/fit-score-widget";
 
@@ -55,7 +58,7 @@ export default async function JobDetailPage({
 
   if (!jobRow) notFound();
 
-  const [[org], [tracked], [fit], orgNotes, allAlumni] = await Promise.all([
+  const [[org], [tracked], [fit], orgNotes, allAlumni, similarJobs] = await Promise.all([
     jobRow.orgId
       ? db
           .select()
@@ -103,6 +106,31 @@ export default async function JobDetailPage({
       .from(schema.profile)
       .innerJoin(schema.user, eq(schema.user.id, schema.profile.userId))
       .where(eq(schema.profile.alumniOptIn, true)),
+    db
+      .select({
+        id: schema.job.id,
+        title: schema.job.title,
+        orgName: schema.job.orgName,
+        type: schema.job.type,
+        experience: schema.job.experience,
+        location: schema.job.location,
+        locationType: schema.job.locationType,
+        deadline: schema.job.deadline,
+        sectors: schema.job.sectors,
+      })
+      .from(schema.job)
+      .where(
+        and(
+          eq(schema.job.status, "published"),
+          ne(schema.job.id, jobRow.id),
+          or(
+            jobRow.type ? eq(schema.job.type, jobRow.type) : sql`TRUE`,
+            sql`${jobRow.sectors} && ${schema.job.sectors}`,
+          ),
+        ),
+      )
+      .orderBy(desc(schema.job.postedAt))
+      .limit(3),
   ]);
 
   const matchingAlumni = allAlumni.filter(({ profile }) => {
@@ -229,6 +257,31 @@ export default async function JobDetailPage({
               Apply on official site
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
+
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                `Check this policy opening on Docket: ${jobRow.title} at ${jobRow.orgName} — https://docket-mpp.vercel.app/jobs/${jobRow.id}`,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-950 hover:bg-emerald-100"
+              title="Share to cohort WhatsApp group"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              WhatsApp
+            </a>
+
+            <form action={reportClosedJobAction}>
+              <input type="hidden" name="jobId" value={jobRow.id} />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-2.5 py-2 text-xs text-stone-500 hover:border-rose-400 hover:text-rose-700"
+                title="Report this job as closed or dead link to save cohort time"
+              >
+                <AlertCircle className="h-3.5 w-3.5" />
+                Report Closed
+              </button>
+            </form>
           </div>
         </div>
 
@@ -387,6 +440,56 @@ export default async function JobDetailPage({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Similar Early-Career Openings */}
+      {similarJobs.length > 0 && (
+        <div className="rounded-2xl border border-stone-200 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-stone-900">
+                More Relevant Early-Career Roles &amp; Fellowships
+              </h2>
+              <p className="text-xs text-stone-500">
+                Overlapping mandates in {jobRow.sectors.join(", ")}
+              </p>
+            </div>
+            <Link
+              href="/jobs"
+              className="text-xs font-semibold text-stone-900 hover:underline"
+            >
+              Back to all mandates →
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {similarJobs.map((sj) => (
+              <Link
+                key={sj.id}
+                href={`/jobs/${sj.id}`}
+                prefetch={false}
+                className="flex flex-col justify-between rounded-xl border border-stone-200 p-3.5 transition hover:border-stone-900"
+              >
+                <div>
+                  <div className="font-mono-tabular text-[10px] font-bold text-stone-600 uppercase line-clamp-1">
+                    {sj.orgName}
+                  </div>
+                  <div className="mt-1 line-clamp-2 text-xs font-bold text-stone-950">
+                    {sj.title}
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-2 font-mono-tabular text-[10px]">
+                  <span className="text-stone-500 uppercase">
+                    {label(JOB_TYPES, sj.type)}
+                  </span>
+                  <span className="font-semibold text-stone-900">
+                    {sj.deadline ? `Due ${sj.deadline}` : "Open"}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

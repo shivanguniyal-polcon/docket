@@ -43,6 +43,10 @@ export default async function JobDetailPage({
   const user = await getUser();
   const { id } = await params;
 
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (!isUuid) notFound();
+
   const [jobRow] = await db
     .select()
     .from(schema.job)

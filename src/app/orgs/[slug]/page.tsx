@@ -190,7 +190,9 @@ export default async function OrgDetailPage({
               <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-stone-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
                   {playbook?.tier
-                    ? `${playbook.tier.toUpperCase()} TIER TARGET`
+                    ? playbook.tier === "safety_rolling"
+                      ? "DIRECT-INTAKE / ROLLING"
+                      : `${playbook.tier.toUpperCase()} TIER TARGET`
                     : "INSTITUTION PLAYBOOK"}
                 </span>
                 <h2 className="font-serif-editorial text-xl font-normal text-stone-950">
@@ -234,7 +236,7 @@ export default async function OrgDetailPage({
 
                     <div className="border-l-4 border-amber-900 bg-amber-50/70 p-3.5">
                       <div className="font-mono-tabular text-[10px] font-bold text-amber-950 uppercase">
-                        Tactical Strategy (How to Apply When 0 Jobs Are Listed)
+                        Tactical Protocol (Off-Cycle &amp; Grant-Based Outreach)
                       </div>
                       <p className="mt-1 text-xs leading-relaxed text-stone-800">
                         {playbook.howToApplyWhenZeroListed}

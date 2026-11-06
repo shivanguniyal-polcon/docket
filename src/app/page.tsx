@@ -77,6 +77,13 @@ export default async function LandingPage() {
               >
                 Archetype Matcher &amp; Field Manual
               </Link>
+              <Link
+                href="/submit"
+                className="inline-flex items-center gap-1.5 border border-amber-900 bg-amber-50 px-4 py-2.5 text-xs font-semibold tracking-wider text-amber-950 uppercase hover:bg-amber-100"
+              >
+                Hire / Post Mandate
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
               {!user && (
                 <Link
                   href="/sign-in"
@@ -129,6 +136,21 @@ export default async function LandingPage() {
                 Combines live ATS feeds (Ashby, Greenhouse, Lever, Workday,
                 SmartRecruiters) with local deep-crawl snapshots pushed via Git.
               </p>
+            </div>
+
+            <div className="border border-stone-900 bg-white p-3.5 text-xs text-stone-800">
+              <div className="font-mono-tabular text-[10px] font-bold text-amber-900 uppercase">
+                EMPLOYERS, PRACTICE HEADS &amp; PARTNERS
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-stone-600">
+                Staffing an unadvertised consulting mandate, fellowship, or policy project?
+              </p>
+              <Link
+                href="/submit"
+                className="mt-2 inline-flex items-center gap-1 font-mono-tabular text-[11px] font-bold text-stone-900 underline uppercase hover:text-amber-900"
+              >
+                Drop Mandate in 30 Seconds (No Login) →
+              </Link>
             </div>
           </div>
         </div>

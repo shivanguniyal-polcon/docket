@@ -124,9 +124,11 @@ export function AppNav({
             <Link
               href="/submit"
               className="inline-flex items-center gap-1 border border-stone-900 bg-[#FBF9F4] px-3 py-1.5 text-xs font-semibold text-stone-900 transition hover:bg-stone-900 hover:text-[#F6F3EC]"
+              title="Employers, Recruiters & Cohort: Post a mandate or vacancy (Zero login required)"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Log Mandate</span>
+              <span className="hidden sm:inline">Hire / Post Mandate</span>
+              <span className="sm:hidden">Post</span>
             </Link>
             {user ? (
               <>

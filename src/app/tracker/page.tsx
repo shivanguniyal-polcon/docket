@@ -84,7 +84,7 @@ export default async function TrackerPage() {
   }
   if (consultingCount > 0 && thinkTankOrSafetyCount < 2) {
     portfolioWarnings.push(
-      "High Concentration Risk: Your pipeline is heavy on selective consulting firms with fewer than 2 Think-Tank / Rolling Portal safety nets.",
+      "High Concentration Risk: Your pipeline is heavy on selective consulting firms with fewer than 2 Think-Tank / Direct-Intake Portals.",
     );
   }
   if (activeSubmittedCount > 0 && withFollowUp === 0) {
@@ -101,7 +101,7 @@ export default async function TrackerPage() {
             § 02 · PERSONAL PLACEMENT LEDGER &amp; PORTFOLIO RADAR
           </div>
           <h1 className="font-serif-editorial mt-1 text-3xl font-normal tracking-tight text-stone-950">
-            My Application Tracker &amp; Safety-Net Diagnostic
+            My Application Tracker &amp; Portfolio Diagnostic
           </h1>
           <p className="mt-1 text-xs text-stone-700">
             Track every target organization, CV version, writing sample &amp;
@@ -150,7 +150,7 @@ export default async function TrackerPage() {
             </div>
             <div className="border border-stone-300 bg-white p-3">
               <div className="font-mono-tabular text-[10px] font-bold text-stone-500 uppercase">
-                Think Tank &amp; Rolling Nets
+                Think Tank &amp; Direct Portals
               </div>
               <div className="font-mono-tabular mt-1 text-2xl font-bold text-emerald-900">
                 {thinkTankOrSafetyCount}
@@ -173,7 +173,7 @@ export default async function TrackerPage() {
             {portfolioWarnings.length === 0 ? (
               <p className="mt-1 text-xs font-semibold text-emerald-900">
                 ✓ Your placement pipeline is well-balanced across reach consulting,
-                core think tanks, and rolling safety-net institutions.
+                core think tanks, and recurring direct-intake institutions.
               </p>
             ) : (
               <ul className="mt-1 space-y-1 text-xs leading-relaxed text-stone-800">
@@ -264,13 +264,13 @@ export default async function TrackerPage() {
         <div className="border-2 border-stone-900 bg-[#FBF9F4] p-8">
           <div className="max-w-2xl">
             <span className="bg-amber-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
-              STARTER SAFETY NET
+              FOUNDATION &amp; DIRECT-INTAKE PORTALS
             </span>
             <h2 className="font-serif-editorial mt-2 text-2xl text-stone-950">
-              Your Placement Board is Empty — Start With 5 Guaranteed Rolling Portals
+              Your Placement Board is Empty — Start With 5 Recommended Direct-Intake Portals
             </h2>
             <p className="mt-1 text-xs text-stone-700 leading-relaxed">
-              Don&apos;t wait for off-campus cold calls. Every successful MPP student keeps at least 5 always-open government and think-tank rolling portals in their pipeline:
+              Don&apos;t wait for off-campus cold calls. Every successful MPP student keeps at least 5 recurring government and think-tank direct portals in their pipeline:
             </p>
           </div>
 

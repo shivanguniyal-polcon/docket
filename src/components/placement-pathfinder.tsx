@@ -594,15 +594,14 @@ export function PlacementPathfinder({
               </div>
             </div>
 
-            {/* Tier 3: Rolling & Monthly Safety Nets */}
+            {/* Tier 3: Rolling & Direct-Intake Portals */}
             <div className="border border-stone-900 bg-[#F6F3EC] p-4">
               <div className="border-b border-stone-900 pb-2">
                 <span className="bg-emerald-900 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-[#FBF9F4] uppercase">
-                  TIER 3 · ROLLING &amp; SAFETY NETS ({safetyOrgs.length})
+                  TIER 3 · ROLLING &amp; DIRECT-INTAKE PORTALS ({safetyOrgs.length})
                 </span>
                 <p className="mt-1 text-[11px] text-stone-600">
-                  Rolling portals, monthly government windows, and research institutes
-                  that guarantee no student goes unplaced.
+                  Rolling portals, monthly government windows, and recurring institutional intakes.
                 </p>
               </div>
               <div className="mt-3 divide-y divide-stone-300">
@@ -663,6 +662,16 @@ export function PlacementPathfinder({
                 college club project) and select your background. Docket rewrites it
                 into 3 employer-ready CV bullets.
               </p>
+
+              <div className="border border-amber-900/40 bg-amber-50/70 p-3 text-xs">
+                <div className="font-mono-tabular flex items-center gap-1.5 text-[10px] font-bold text-amber-950 uppercase">
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-800 shrink-0" />
+                  Anti-Template Cloning Rule for IITD MPP Candidates
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-stone-800">
+                  Do not copy these bullets verbatim. Policy screening committees read multiple applications from the same batch. Always substitute your actual survey sample size (e.g. n=1,200), specific statutory section, or state ministry name.
+                </p>
+              </div>
 
               <div>
                 <label className="font-mono-tabular block text-[10px] font-bold text-stone-800 uppercase">

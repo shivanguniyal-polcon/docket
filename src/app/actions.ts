@@ -10,6 +10,7 @@ import {
   requireModerator,
   requireOwner,
   isModerator,
+  getUser,
 } from "@/lib/session";
 import {
   classifyExperience,
@@ -226,14 +227,15 @@ export async function deleteApplicationAction(formData: FormData) {
 /* -------------------------------------------------------------------------- */
 
 export async function submitJobAction(formData: FormData) {
-  const user = await requireUser();
+  const user = await getUser();
   const title = String(formData.get("title") ?? "").trim();
   const orgId = String(formData.get("orgId") ?? "").trim() || null;
   const customOrgName = String(formData.get("orgName") ?? "").trim();
   const url = String(formData.get("url") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim() || "India";
   const deadline = String(formData.get("deadline") ?? "").trim() || null;
-  const description = String(formData.get("description") ?? "").trim() || null;
+  let description = String(formData.get("description") ?? "").trim() || null;
+  const submitterContact = String(formData.get("submitterContact") ?? "").trim();
   const explicitType = String(formData.get("type") ?? "").trim();
   const explicitExp = String(formData.get("experience") ?? "").trim();
   const selectedSectors = formData
@@ -242,6 +244,10 @@ export async function submitJobAction(formData: FormData) {
     .filter(Boolean);
 
   if (!title || !url) return;
+
+  if (submitterContact) {
+    description = `${description ?? ""}\n\n[Recruiter / Partner Contact: ${submitterContact}]`.trim();
+  }
 
   let orgName = customOrgName;
   let orgSectors: string[] = [];
@@ -268,7 +274,7 @@ export async function submitJobAction(formData: FormData) {
     explicitExp || classifyExperience(title, description ?? "");
   const locationType = classifyLocationType(location, description ?? "");
   const fingerprint = makeFingerprint(orgName, title, url);
-  const autoApprove = isModerator(user.role);
+  const autoApprove = Boolean(user && isModerator(user.role));
 
   await db
     .insert(schema.job)
@@ -287,8 +293,8 @@ export async function submitJobAction(formData: FormData) {
       deadline,
       postedAt: new Date(),
       status: autoApprove ? "published" : "pending",
-      submittedBy: user.id,
-      reviewedBy: autoApprove ? user.id : null,
+      submittedBy: user?.id ?? null,
+      reviewedBy: autoApprove && user ? user.id : null,
     })
     .onConflictDoNothing({ target: schema.job.fingerprint });
 
@@ -533,6 +539,13 @@ export async function updateProfileAction(formData: FormData) {
   const linkedinUrl = String(formData.get("linkedinUrl") ?? "").trim() || null;
   const gradYearRaw = String(formData.get("gradYear") ?? "").trim();
   const gradYear = gradYearRaw ? parseInt(gradYearRaw, 10) || null : null;
+  const coreSpike = String(formData.get("coreSpike") ?? "").trim() || null;
+  const workSampleTitle =
+    String(formData.get("workSampleTitle") ?? "").trim() || null;
+  const workSampleUrl =
+    String(formData.get("workSampleUrl") ?? "").trim() || null;
+  const capstoneTopic =
+    String(formData.get("capstoneTopic") ?? "").trim() || null;
   const emailReminders = formData.get("emailReminders") === "on";
   const weeklyDigest = formData.get("weeklyDigest") === "on";
 
@@ -558,6 +571,10 @@ export async function updateProfileAction(formData: FormData) {
       currentRole,
       linkedinUrl,
       gradYear,
+      coreSpike,
+      workSampleTitle,
+      workSampleUrl,
+      capstoneTopic,
       emailReminders,
       weeklyDigest,
       updatedAt: new Date(),
@@ -576,6 +593,10 @@ export async function updateProfileAction(formData: FormData) {
         currentRole,
         linkedinUrl,
         gradYear,
+        coreSpike,
+        workSampleTitle,
+        workSampleUrl,
+        capstoneTopic,
         emailReminders,
         weeklyDigest,
         updatedAt: new Date(),

@@ -339,12 +339,27 @@ export function SubmitJobForm({
         />
       </div>
 
+      <div>
+        <label className="block text-xs font-semibold text-stone-700">
+          Your Contact / Submitter Email (Optional)
+        </label>
+        <input
+          type="text"
+          name="submitterContact"
+          placeholder="e.g. partner@policyfirm.org or Phone/LinkedIn — for moderation follow-up"
+          className="mt-1 w-full rounded-xl border border-stone-300 p-2.5 text-xs"
+        />
+        <p className="mt-1 text-[11px] text-stone-500">
+          Recruiters &amp; partners: leave your contact if you want cohort applications routed to a specific inbox.
+        </p>
+      </div>
+
       <SubmitButton
         pendingText={autoPublish ? "Publishing…" : "Submitting…"}
         icon={<PlusCircle className="h-4 w-4" />}
         className="rounded-xl bg-stone-900 px-5 py-2.5 text-xs font-semibold text-white hover:bg-stone-800"
       >
-        {autoPublish ? "Publish Opening" : "Submit for Moderator Review"}
+        {autoPublish ? "Publish Opening" : "Submit Opening to Cohort Review Desk"}
       </SubmitButton>
     </form>
   );

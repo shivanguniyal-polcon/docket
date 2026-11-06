@@ -143,6 +143,7 @@ export function FitScoreWidget({
     outreachType?: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [customArtifact, setCustomArtifact] = useState("");
 
   // Local anonymous profile drawer
   const [profile, setProfile] = useState<LocalCandidateProfile>(getStoredProfile);
@@ -231,8 +232,14 @@ export function FitScoreWidget({
 
   async function copyDraft() {
     if (!coverNote) return;
+    let finalBody = coverNote.body;
+    if (customArtifact.trim()) {
+      if (!finalBody.includes(customArtifact.trim())) {
+        finalBody = `${finalBody}\n\n[Attached Work Sample: ${customArtifact.trim()}]`;
+      }
+    }
     await navigator.clipboard.writeText(
-      `Subject: ${coverNote.subject}\n\n${coverNote.body}`,
+      `Subject: ${coverNote.subject}\n\n${finalBody}`,
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -433,6 +440,29 @@ export function FitScoreWidget({
 
       {/* Multi-Format Outreach Drafter Strip */}
       <div className="mt-5 border-t border-stone-300 pt-4">
+        {/* Anti-Template Cloning Recruiter Rule */}
+        <div className="mb-3 border-l-4 border-amber-900 bg-amber-50/70 p-3 text-xs">
+          <div className="font-mono-tabular flex items-center gap-1.5 font-bold text-amber-950 uppercase">
+            <AlertCircle className="h-3.5 w-3.5 text-amber-800 shrink-0" />
+            Recruiter Advisory · Anti-Template Cloning Rule
+          </div>
+          <p className="mt-1 leading-relaxed text-stone-800">
+            Indian policy teams (CEEW, Dalberg, Samagra, CSEP, Koan) immediately discard generic AI templates. <strong>Ground this draft in your specific empirical work sample, dataset, or term paper topic before hitting send.</strong>
+          </p>
+          <div className="mt-2.5">
+            <label className="font-mono-tabular block text-[10px] font-bold text-stone-700 uppercase">
+              Your Specific Work Sample / Dataset / Paper Topic (Auto-Injected):
+            </label>
+            <input
+              type="text"
+              value={customArtifact}
+              onChange={(e) => setCustomArtifact(e.target.value)}
+              placeholder="e.g. My 2-page brief on SERC green open access tariffs, or PLFS 2023 econometric model"
+              className="mt-1 w-full border border-stone-300 bg-white p-2 font-sans text-xs text-stone-900 focus:outline-none focus:border-stone-900"
+            />
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="font-mono-tabular text-[11px] font-bold text-amber-900 uppercase">
             ⚡ 1-CLICK OUTREACH GENERATOR (CHOOSE FORMAT)

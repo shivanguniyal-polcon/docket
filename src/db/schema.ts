@@ -140,13 +140,17 @@ export const profile = pgTable("profile", {
   resumeText: text("resume_text"),
   resumeFileName: text("resume_file_name"),
   resumeUpdatedAt: timestamp("resume_updated_at"),
-  // Alumni directory
+  // Alumni directory & proof-of-work
   alumniOptIn: boolean("alumni_opt_in").notNull().default(false),
   openToReferrals: boolean("open_to_referrals").notNull().default(false),
   currentOrg: text("current_org"),
   currentRole: text("current_role"),
   linkedinUrl: text("linkedin_url"),
   gradYear: integer("grad_year"),
+  coreSpike: text("core_spike"),
+  workSampleTitle: text("work_sample_title"),
+  workSampleUrl: text("work_sample_url"),
+  capstoneTopic: text("capstone_topic"),
   // Notifications
   emailReminders: boolean("email_reminders").notNull().default(true),
   weeklyDigest: boolean("weekly_digest").notNull().default(true),

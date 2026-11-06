@@ -360,6 +360,65 @@ export default async function SettingsPage({
                 className="rounded-xl border border-stone-300 px-3 py-2"
               />
             </div>
+
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/50 p-3.5">
+              <div className="font-semibold text-amber-950">
+                Proof-of-Work &amp; Capstone Specialization (Shown on Directory)
+              </div>
+              <p className="mt-0.5 text-[11px] text-stone-600">
+                Signals your domain spike and work sample to recruiters and cohort members.
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-700">
+                    Core Policy Spike / Specialization
+                  </label>
+                  <input
+                    type="text"
+                    name="coreSpike"
+                    defaultValue={profile?.coreSpike ?? ""}
+                    placeholder="e.g. Electricity Tariff &amp; DISCOM Finance, DPDP &amp; AI Regulation"
+                    className="mt-1 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-700">
+                    Capstone / Master&apos;s Thesis Topic
+                  </label>
+                  <input
+                    type="text"
+                    name="capstoneTopic"
+                    defaultValue={profile?.capstoneTopic ?? ""}
+                    placeholder="e.g. Open Access Solar Integration under PM-KUSUM"
+                    className="mt-1 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-700">
+                    Work Sample Title / 2-Page Brief
+                  </label>
+                  <input
+                    type="text"
+                    name="workSampleTitle"
+                    defaultValue={profile?.workSampleTitle ?? ""}
+                    placeholder="e.g. 2-Page Brief: Reforming State SERC Banking Norms"
+                    className="mt-1 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-700">
+                    Work Sample URL (PDF / GDrive / GitHub / Published Article)
+                  </label>
+                  <input
+                    type="url"
+                    name="workSampleUrl"
+                    defaultValue={profile?.workSampleUrl ?? ""}
+                    placeholder="https://drive.google.com/... or https://github.com/..."
+                    className="mt-1 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="border-t border-stone-200 pt-4">

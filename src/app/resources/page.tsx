@@ -2,10 +2,11 @@ import Link from "next/link";
 import { Plus, CheckCircle2, BookOpen } from "lucide-react";
 import { getUser, isModerator } from "@/lib/session";
 import { db, schema } from "@/db";
-import { desc } from "drizzle-orm";
+import { desc, eq, isNotNull, or } from "drizzle-orm";
 import { saveResourceAction } from "@/app/actions";
 import { SubmitButton } from "@/components/loading-button";
 import { PlacementPathfinder } from "@/components/placement-pathfinder";
+import { AssignmentCaseVault } from "@/components/assignment-case-vault";
 
 const CATEGORIES: Record<string, string> = {
   cv: "CV & Writing Samples",
@@ -112,10 +113,45 @@ export default async function ResourcesPage({
 }) {
   const resolvedParams = searchParams ? await searchParams : undefined;
   const user = await getUser();
-  const resources = await db
-    .select()
-    .from(schema.resource)
-    .orderBy(desc(schema.resource.updatedAt));
+  const [resources, assignmentRows] = await Promise.all([
+    db
+      .select()
+      .from(schema.resource)
+      .orderBy(desc(schema.resource.updatedAt)),
+    db
+      .select({
+        note: schema.orgNote,
+        orgName: schema.organization.name,
+        orgSlug: schema.organization.slug,
+      })
+      .from(schema.orgNote)
+      .innerJoin(
+        schema.organization,
+        eq(schema.organization.id, schema.orgNote.orgId),
+      )
+      .where(
+        or(
+          eq(schema.orgNote.kind, "assignment"),
+          eq(schema.orgNote.kind, "interview"),
+          isNotNull(schema.orgNote.assignmentTimeLimit),
+        ),
+      )
+      .orderBy(desc(schema.orgNote.createdAt)),
+  ]);
+
+  const vaultPrompts = assignmentRows
+    .filter((r) => r.note.body && r.note.body.trim().length > 0)
+    .map((r) => ({
+      id: r.note.id,
+      orgName: r.orgName,
+      orgSlug: r.orgSlug,
+      roleTitle: r.note.roleTitle,
+      timeLimit: r.note.assignmentTimeLimit,
+      tools: r.note.assignmentTools,
+      prompt: r.note.body,
+      batch: r.note.batch,
+      isVerified: true,
+    }));
 
   const canEdit = user ? isModerator(user.role) : false;
 
@@ -391,6 +427,38 @@ export default async function ResourcesPage({
             </article>
           ))}
         </div>
+      </section>
+
+      {/* Section 4: The 48-Hour Take-Home Assignment & Case Vault */}
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-stone-900 pb-2">
+          <div>
+            <h2 className="font-mono-tabular text-xs font-bold tracking-widest text-stone-900 uppercase">
+              PART IV · THE 48-HOUR TAKE-HOME ASSIGNMENT &amp; CASE VAULT
+            </h2>
+            <p className="mt-0.5 text-xs text-stone-600">
+              Verified prompts tested by policy think tanks, consulting firms, and evaluation labs with simulated 48h countdown.
+            </p>
+          </div>
+          <span className="font-mono-tabular text-[11px] text-stone-500">
+            {vaultPrompts.length > 0
+              ? `${vaultPrompts.length} VERIFIED PROMPTS`
+              : "INDEX: UNDER CONSTRUCTION"}
+          </span>
+        </div>
+
+        {vaultPrompts.length > 0 ? (
+          <AssignmentCaseVault prompts={vaultPrompts} />
+        ) : (
+          <div className="border border-dashed border-stone-300 bg-[#FBF9F4] p-8 text-center">
+            <p className="font-serif-editorial text-lg text-stone-900">
+              Under construction
+            </p>
+            <p className="mt-1 text-xs text-stone-600">
+              No verified 48-hour assignments or interview prompts submitted by the cohort yet. Check back soon or contribute your interview prompt via organization profiles.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );

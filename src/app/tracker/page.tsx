@@ -23,6 +23,7 @@ import {
   updateApplicationAction,
 } from "@/app/actions";
 import { SubmitButton } from "@/components/loading-button";
+import { ApplicationChecklist } from "@/components/application-checklist";
 
 const COLUMNS: {
   key: ApplicationStatus;
@@ -39,11 +40,27 @@ const COLUMNS: {
 
 export default async function TrackerPage() {
   const user = await requireUser();
-  const apps = await db
-    .select()
-    .from(schema.application)
-    .where(eq(schema.application.userId, user.id))
-    .orderBy(desc(schema.application.updatedAt));
+  const [apps, allCohortApps] = await Promise.all([
+    db
+      .select()
+      .from(schema.application)
+      .where(eq(schema.application.userId, user.id))
+      .orderBy(desc(schema.application.updatedAt)),
+    db
+      .select({
+        orgName: schema.application.orgName,
+        status: schema.application.status,
+      })
+      .from(schema.application),
+  ]);
+
+  const cohortInterviewingByOrg = new Map<string, number>();
+  for (const c of allCohortApps) {
+    if (c.status === "interviewing" || c.status === "applied") {
+      const key = c.orgName.toLowerCase().trim();
+      cohortInterviewingByOrg.set(key, (cohortInterviewingByOrg.get(key) ?? 0) + 1);
+    }
+  }
 
   const grouped = new Map<ApplicationStatus, typeof apps>();
   for (const s of APPLICATION_STATUSES) grouped.set(s, []);
@@ -478,6 +495,16 @@ export default async function TrackerPage() {
                             </Link>
                           </div>
                         )}
+
+                        {/* Application Deliverables & Ghosting Checklist */}
+                        <ApplicationChecklist
+                          applicationId={a.id}
+                          orgName={a.orgName}
+                          title={a.title}
+                          appliedAt={a.appliedAt}
+                          status={a.status}
+                          cohortInterviewingCount={cohortInterviewingByOrg.get(a.orgName.toLowerCase().trim()) ?? 0}
+                        />
 
                         {/* Quick status move */}
                         <div className="mt-3 flex flex-wrap items-center justify-between gap-1 border-t border-stone-100 pt-2.5">

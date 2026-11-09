@@ -34,6 +34,10 @@ import {
   ORG_HIRING_PLAYBOOK,
   type BackgroundId,
 } from "@/lib/placement-intelligence";
+import { analyzeJobGates } from "@/lib/job-analysis";
+import { ComparatorProvider, CompareCheckbox } from "@/components/job-comparator";
+import { SavedFilterPresets } from "@/components/saved-filter-presets";
+import { QuickForwardModal } from "@/components/quick-forward-modal";
 
 interface SearchParams {
   q?: string;
@@ -48,6 +52,7 @@ interface SearchParams {
   fresh?: string; // "true"
   paid?: string; // "true"
   archetype?: string; // BackgroundId
+  academic?: string; // "true"
 }
 
 function getFreshnessBadge(postedAt: Date | string | null) {
@@ -163,6 +168,24 @@ export default async function JobsPage({
       )!,
     );
   }
+  if (params.academic === "true") {
+    conditions.push(
+      or(
+        ilike(schema.job.title, "%research associate%"),
+        ilike(schema.job.title, "%ra %"),
+        ilike(schema.job.title, "%fellow%"),
+        ilike(schema.job.orgName, "%iit%"),
+        ilike(schema.job.orgName, "%isb%"),
+        ilike(schema.job.orgName, "%iim%"),
+        ilike(schema.job.orgName, "%nipfp%"),
+        ilike(schema.job.orgName, "%igidr%"),
+        ilike(schema.job.orgName, "%cpr%"),
+        ilike(schema.job.orgName, "%csep%"),
+        ilike(schema.job.orgName, "%icrier%"),
+        sql`${schema.job.type} IN ('fellowship', 'graduate_program')`,
+      )!,
+    );
+  }
   if (activeArchetype) {
     const targetPlaybook = Object.values(ORG_HIRING_PLAYBOOK).filter((o) =>
       o.bestFor.includes(activeArchetype.id),
@@ -197,6 +220,8 @@ export default async function JobsPage({
     userFits,
     alumniRows,
     compNotes,
+    cohortAppCounts,
+    assignmentNotes,
   ] = await Promise.all([
     db
       .select({ totalCount: count() })
@@ -255,7 +280,36 @@ export default async function JobsPage({
       })
       .from(schema.orgNote)
       .where(isNotNull(schema.orgNote.compensation)),
+    db
+      .select({
+        jobId: schema.application.jobId,
+        count: count(),
+      })
+      .from(schema.application)
+      .where(isNotNull(schema.application.jobId))
+      .groupBy(schema.application.jobId),
+    db
+      .select({
+        orgId: schema.orgNote.orgId,
+        body: schema.orgNote.body,
+        timeLimit: schema.orgNote.assignmentTimeLimit,
+        roleTitle: schema.orgNote.roleTitle,
+      })
+      .from(schema.orgNote)
+      .where(
+        or(
+          eq(schema.orgNote.kind, "assignment"),
+          isNotNull(schema.orgNote.assignmentTimeLimit),
+        ),
+      ),
   ]);
+
+  const cohortCountByJobId = new Map(
+    cohortAppCounts.map((c) => [c.jobId!, Number(c.count)]),
+  );
+  const assignmentByOrgId = new Map(
+    assignmentNotes.map((a) => [a.orgId, a]),
+  );
 
   const appByJobId = new Map(
     userApps.filter((a) => a.jobId).map((a) => [a.jobId!, a]),
@@ -295,6 +349,7 @@ export default async function JobsPage({
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <QuickForwardModal />
           <Link
             href="/resources"
             className="inline-flex items-center gap-1.5 border border-stone-900 bg-[#FBF9F4] px-3.5 py-2 text-xs font-bold tracking-wider text-stone-900 uppercase hover:bg-stone-900 hover:text-[#FBF9F4]"
@@ -306,7 +361,7 @@ export default async function JobsPage({
             className="inline-flex items-center gap-1.5 border border-stone-900 bg-stone-900 px-4 py-2 text-xs font-semibold tracking-wider text-[#F6F3EC] uppercase hover:bg-stone-800"
           >
             <Plus className="h-3.5 w-3.5" />
-            Log URL or WhatsApp Forward
+            Log URL
           </Link>
         </div>
       </div>
@@ -494,6 +549,9 @@ export default async function JobsPage({
         </div>
       )}
 
+      {/* Saved & Quick Filter Presets */}
+      <SavedFilterPresets />
+
       {/* Editorial Filter Console */}
       <form
         method="GET"
@@ -573,6 +631,7 @@ export default async function JobsPage({
               { href: "/jobs?experience=0-2", label: "0–2 YRS (MAY 2027 GRADS)" },
               { href: "/jobs?paid=true", label: "💰 STIPEND / PAY KNOWN" },
               { href: "/jobs?fresh=true", label: "⚡ FRESH (< 7 DAYS)" },
+              { href: "/jobs?academic=true", label: "🔬 ACADEMIC & LAB RAs" },
               { href: "/jobs?archetype=upsc_humanities", label: "🎯 UPSC/HUMANITIES" },
               { href: "/jobs?archetype=stem_btech", label: "⚡ B.TECH / STEM" },
               { href: "/jobs?archetype=econ_quant", label: "📊 ECON / QUANT" },
@@ -611,94 +670,172 @@ export default async function JobsPage({
       </form>
 
       {/* High-Density Editorial Ledger Rows */}
-      {jobs.length === 0 ? (
-        <div className="border border-stone-900 bg-[#FBF9F4] p-12 text-center">
-          <p className="font-serif-editorial text-xl text-stone-900">
-            No mandates match the active filter criteria.
-          </p>
-          <p className="mt-1 text-xs text-stone-600">
-            Reset filters above or log an opening from a WhatsApp forward or
-            career link.
-          </p>
-        </div>
-      ) : (
-        <div className="divide-y divide-stone-300 border border-stone-900 bg-[#FBF9F4]">
-          {/* Table Header (desktop) */}
-          <div className="hidden grid-cols-12 gap-3 border-b border-stone-900 bg-[#EFECE4] px-4 py-2 font-mono-tabular text-[10px] font-bold tracking-wider text-stone-700 uppercase lg:grid">
-            <div className="col-span-3">Institution &amp; Location</div>
-            <div className="col-span-5">Mandate &amp; JD Excerpt</div>
-            <div className="col-span-2">Band &amp; Sector</div>
-            <div className="col-span-2 text-right">Fit &amp; Action</div>
+      <ComparatorProvider>
+        {jobs.length === 0 ? (
+          <div className="border border-stone-900 bg-[#FBF9F4] p-12 text-center">
+            <p className="font-serif-editorial text-xl text-stone-900">
+              {params.academic === "true" ? (
+                <span>
+                  Academic &amp; Lab RAship Index:{" "}
+                  <span className="italic text-stone-600 font-mono-tabular text-sm">Under construction</span>
+                </span>
+              ) : (
+                "No mandates match the active filter criteria."
+              )}
+            </p>
+            <p className="mt-1 text-xs text-stone-600">
+              {params.academic === "true"
+                ? "No active academic RAships currently indexed. Submit a circular or grant-funded RA opening from your lab/professor using the Quick Ingest button above."
+                : "Reset filters above or log an opening from a WhatsApp forward or career link."}
+            </p>
           </div>
+        ) : (
+          <div className="divide-y divide-stone-300 border border-stone-900 bg-[#FBF9F4]">
+            {/* Table Header (desktop) */}
+            <div className="hidden grid-cols-12 gap-3 border-b border-stone-900 bg-[#EFECE4] px-4 py-2 font-mono-tabular text-[10px] font-bold tracking-wider text-stone-700 uppercase lg:grid">
+              <div className="col-span-3">Institution &amp; Location</div>
+              <div className="col-span-5">Mandate &amp; JD Excerpt</div>
+              <div className="col-span-2">Band &amp; Sector</div>
+              <div className="col-span-2 text-right">Fit &amp; Action</div>
+            </div>
 
-          {jobs.map((j) => {
-            const tracked = appByJobId.get(j.id);
-            const fit = fitByJobId.get(j.id);
-            const alumniCount = countAlumniForOrg(j.orgName);
-            const compInfo = j.orgId ? compByOrgId.get(j.orgId) : undefined;
-            const estimatedComp = getEstimatedCompensation(j.orgName, j.title);
-            const displayComp = compInfo || estimatedComp;
+            {jobs.map((j) => {
+              const tracked = appByJobId.get(j.id);
+              const fit = fitByJobId.get(j.id);
+              const alumniCount = countAlumniForOrg(j.orgName);
+              const compInfo = j.orgId ? compByOrgId.get(j.orgId) : undefined;
+              const estimatedComp = getEstimatedCompensation(j.orgName, j.title);
+              const displayComp = compInfo || estimatedComp;
+              const gates = analyzeJobGates(j);
+              const cohortCount = cohortCountByJobId.get(j.id) ?? 0;
+              const assignmentInfo = j.orgId ? assignmentByOrgId.get(j.orgId) : undefined;
+              const comparableJob = {
+                id: j.id,
+                title: j.title,
+                orgName: j.orgName,
+                url: j.url,
+                location: j.location,
+                experience: j.experience,
+                type: j.type,
+                sectors: j.sectors,
+                deadline: j.deadline,
+                gates,
+                compensation: displayComp,
+                assignmentInfo: assignmentInfo?.timeLimit
+                  ? `${assignmentInfo.timeLimit} test: ${assignmentInfo.body.slice(0, 100)}…`
+                  : null,
+                cohortCount,
+              };
 
-            return (
-              <div
-                key={j.id}
-                className="grid gap-3 px-4 py-4 transition hover:bg-[#EFECE4]/70 lg:grid-cols-12 lg:items-start"
-              >
-                {/* Col 1: Institution, Location, Pay, Alumni */}
-                <div className="space-y-1 lg:col-span-3">
-                  <div className="text-xs font-bold text-stone-950">
-                    {j.orgName}
-                  </div>
-                  <div className="font-mono-tabular text-[11px] text-stone-600">
-                    {j.location ?? label(LOCATION_TYPES, j.locationType)}
-                    {j.deadline ? ` · DUE ${j.deadline}` : ""}
-                  </div>
-                  {displayComp && (
-                    <div className="inline-block border border-emerald-800 bg-emerald-950/10 px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-emerald-950">
-                      PAY: {displayComp}
+              return (
+                <div
+                  key={j.id}
+                  className="grid gap-3 px-4 py-4 transition hover:bg-[#EFECE4]/70 lg:grid-cols-12 lg:items-start"
+                >
+                  {/* Col 1: Institution, Location, Pay, Alumni */}
+                  <div className="space-y-1 lg:col-span-3">
+                    <div className="text-xs font-bold text-stone-950">
+                      {j.orgName}
                     </div>
-                  )}
-                  {alumniCount > 0 && (
-                    <div>
-                      <Link
-                        href={`/jobs/${j.id}`}
-                        prefetch={false}
-                        className="inline-flex items-center gap-1 border border-stone-900 bg-[#EFECE4] px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-stone-900 hover:bg-stone-900 hover:text-[#F6F3EC]"
-                      >
-                        <Users className="h-3 w-3" />
-                        {alumniCount} IITD ALUMNI → REFER
-                      </Link>
+                    <div className="font-mono-tabular text-[11px] text-stone-600">
+                      {j.location ?? label(LOCATION_TYPES, j.locationType)}
+                      {j.deadline ? ` · DUE ${j.deadline}` : ""}
                     </div>
-                  )}
-                </div>
-
-                {/* Col 2: Title, Freshness Badge & JD Snippet */}
-                <div className="space-y-1 lg:col-span-5">
-                  {(() => {
-                    const badge = getFreshnessBadge(j.postedAt);
-                    return badge ? (
-                      <div>
-                        <span
-                          className={`inline-block px-1.5 py-0.5 font-mono-tabular text-[9px] tracking-wider uppercase ${badge.className}`}
-                        >
-                          {badge.label}
-                        </span>
+                    {displayComp && (
+                      <div className="inline-block border border-emerald-800 bg-emerald-950/10 px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-emerald-950">
+                        PAY: {displayComp}
                       </div>
-                    ) : null;
-                  })()}
-                  <Link
-                    href={`/jobs/${j.id}`}
-                    prefetch={false}
-                    className="font-serif-editorial block text-lg leading-snug font-normal text-stone-950 hover:underline"
-                  >
-                    {j.title}
-                  </Link>
-                  {j.description && (
-                    <p className="line-clamp-2 text-xs leading-relaxed text-stone-600">
-                      {j.description}
-                    </p>
-                  )}
-                </div>
+                    )}
+                    {alumniCount > 0 && (
+                      <div>
+                        <Link
+                          href={`/jobs/${j.id}`}
+                          prefetch={false}
+                          className="inline-flex items-center gap-1 border border-stone-900 bg-[#EFECE4] px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-stone-900 hover:bg-stone-900 hover:text-[#F6F3EC]"
+                        >
+                          <Users className="h-3 w-3" />
+                          {alumniCount} IITD ALUMNI → REFER
+                        </Link>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <CompareCheckbox job={comparableJob} />
+                      {cohortCount > 0 ? (
+                        <span className="font-mono-tabular text-[10px] font-bold text-amber-900">
+                          🔥 {cohortCount} in cohort
+                        </span>
+                      ) : (
+                        <span className="font-mono-tabular text-[10px] text-stone-400">
+                          Be 1st to track
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Col 2: Title, Freshness Badge, JD Snippet & Hard-Gate Badges */}
+                  <div className="space-y-1 lg:col-span-5">
+                    {(() => {
+                      const badge = getFreshnessBadge(j.postedAt);
+                      return badge ? (
+                        <div>
+                          <span
+                            className={`inline-block px-1.5 py-0.5 font-mono-tabular text-[9px] tracking-wider uppercase ${badge.className}`}
+                          >
+                            {badge.label}
+                          </span>
+                        </div>
+                      ) : null;
+                    })()}
+                    <Link
+                      href={`/jobs/${j.id}`}
+                      prefetch={false}
+                      className="font-serif-editorial block text-lg leading-snug font-normal text-stone-950 hover:underline"
+                    >
+                      {j.title}
+                    </Link>
+                    {j.description && (
+                      <p className="line-clamp-2 text-xs leading-relaxed text-stone-600">
+                        {j.description}
+                      </p>
+                    )}
+
+                    {/* Hard Gate Badges */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                      <span
+                        className={`border px-1.5 py-0.5 font-mono-tabular text-[9px] font-bold uppercase ${
+                          gates.experienceGate.isEarlyCareer
+                            ? "border-emerald-700 bg-emerald-50 text-emerald-950"
+                            : "border-stone-400 bg-white text-stone-800"
+                        }`}
+                      >
+                        {gates.experienceGate.label}
+                      </span>
+                      <span
+                        className={`border px-1.5 py-0.5 font-mono-tabular text-[9px] font-bold uppercase ${
+                          gates.rollingUrgency.isUrgent
+                            ? "border-amber-700 bg-amber-50 text-amber-950"
+                            : "border-stone-300 bg-stone-50 text-stone-700"
+                        }`}
+                      >
+                        {gates.rollingUrgency.label}
+                      </span>
+                      {gates.quantRequired && (
+                        <span className="border border-sky-600 bg-sky-50 px-1.5 py-0.5 font-mono-tabular text-[9px] font-bold text-sky-950 uppercase">
+                          📊 Quant/R
+                        </span>
+                      )}
+                      {gates.writingSampleRequired && (
+                        <span className="border border-purple-600 bg-purple-50 px-1.5 py-0.5 font-mono-tabular text-[9px] font-bold text-purple-950 uppercase">
+                          📝 Writing Sample
+                        </span>
+                      )}
+                      {gates.languageRequired && (
+                        <span className="border border-stone-500 bg-stone-100 px-1.5 py-0.5 font-mono-tabular text-[9px] font-bold text-stone-900 uppercase">
+                          🗣️ {gates.languageRequired}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
                 {/* Col 3: Experience Band, Type & Sectors */}
                 <div className="flex flex-wrap items-start gap-1 lg:col-span-2">
@@ -827,6 +964,7 @@ export default async function JobsPage({
           })}
         </div>
       )}
+      </ComparatorProvider>
     </div>
   );
 }

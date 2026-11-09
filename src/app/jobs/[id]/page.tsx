@@ -17,7 +17,7 @@ import {
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
 import { ensureDbReady } from "@/db/auto-bootstrap";
-import { and, desc, eq, ne, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, ne, or, sql } from "drizzle-orm";
 import {
   EXPERIENCE,
   JOB_TYPES,
@@ -26,6 +26,7 @@ import {
   APPLICATION_STATUS_LABELS,
   NOTE_KINDS,
   label,
+  getEstimatedCompensation,
   type Sector,
   type ApplicationStatus,
 } from "@/lib/taxonomy";
@@ -39,6 +40,7 @@ import { SubmitButton } from "@/components/loading-button";
 import { FitScoreWidget } from "@/components/fit-score-widget";
 import { StructuredJobDescription } from "@/components/structured-job-description";
 import { ORG_HIRING_PLAYBOOK } from "@/lib/placement-intelligence";
+import { analyzeJobGates } from "@/lib/job-analysis";
 
 export default async function JobDetailPage({
   params,
@@ -61,7 +63,16 @@ export default async function JobDetailPage({
 
   if (!jobRow) notFound();
 
-  const [[org], [tracked], [fit], orgNotes, allAlumni, similarJobs] = await Promise.all([
+  const [
+    [org],
+    [tracked],
+    [fit],
+    orgNotes,
+    allAlumni,
+    similarJobs,
+    [userProfile],
+    [cohortCountRow],
+  ] = await Promise.all([
     jobRow.orgId
       ? db
           .select()
@@ -136,7 +147,23 @@ export default async function JobDetailPage({
       )
       .orderBy(desc(schema.job.postedAt))
       .limit(3),
+    user
+      ? db
+          .select()
+          .from(schema.profile)
+          .where(eq(schema.profile.userId, user.id))
+          .limit(1)
+      : Promise.resolve([ undefined ]),
+    db
+      .select({ count: count() })
+      .from(schema.application)
+      .where(eq(schema.application.jobId, jobRow.id)),
   ]);
+
+  const gates = analyzeJobGates(jobRow);
+  const cohortTrackingCount = Number(cohortCountRow?.count ?? 0);
+  const verifiedComp = orgNotes.find((n) => Boolean(n.compensation))?.compensation || getEstimatedCompensation(jobRow.orgName, jobRow.title);
+  const verifiedAssignment = orgNotes.find((n) => n.kind === "assignment" || Boolean(n.assignmentTimeLimit));
 
   const matchingAlumni = allAlumni.filter(({ profile }) => {
     if (!profile.currentOrg) return false;
@@ -210,6 +237,58 @@ export default async function JobDetailPage({
                   {SECTORS[s as Sector] ?? s}
                 </span>
               ))}
+            </div>
+
+            {/* Hard Gate Badges & Urgency */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-2">
+              <span
+                className={`border px-2 py-0.5 font-mono-tabular text-[10px] font-bold uppercase rounded ${
+                  gates.experienceGate.isEarlyCareer
+                    ? "border-emerald-700 bg-emerald-50 text-emerald-950"
+                    : "border-stone-400 bg-white text-stone-800"
+                }`}
+              >
+                {gates.experienceGate.label}
+              </span>
+              <span
+                className={`border px-2 py-0.5 font-mono-tabular text-[10px] font-bold uppercase rounded ${
+                  gates.rollingUrgency.isUrgent
+                    ? "border-amber-700 bg-amber-50 text-amber-950"
+                    : "border-stone-300 bg-stone-50 text-stone-700"
+                }`}
+              >
+                {gates.rollingUrgency.label}
+              </span>
+              {gates.quantRequired && (
+                <span className="border border-sky-600 bg-sky-50 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-sky-950 uppercase rounded">
+                  📊 Quant / Stata / R Required
+                </span>
+              )}
+              {gates.writingSampleRequired && (
+                <span className="border border-purple-600 bg-purple-50 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-purple-950 uppercase rounded">
+                  📝 Writing Sample Required
+                </span>
+              )}
+              {gates.languageRequired && (
+                <span className="border border-stone-500 bg-stone-100 px-2 py-0.5 font-mono-tabular text-[10px] font-bold text-stone-900 uppercase rounded">
+                  🗣️ {gates.languageRequired}
+                </span>
+              )}
+            </div>
+
+            {/* Cohort Pulse Counter */}
+            <div className="pt-1">
+              <div className="inline-flex items-center gap-1.5 font-mono-tabular text-xs text-stone-700 bg-stone-50 px-3 py-1 border border-stone-300 rounded">
+                {cohortTrackingCount > 0 ? (
+                  <span className="font-bold text-amber-950">
+                    🔥 {cohortTrackingCount} batchmate{cohortTrackingCount > 1 ? "s" : ""} in the cohort are tracking this mandate
+                  </span>
+                ) : (
+                  <span className="text-stone-500">
+                    Be the first in the cohort to track this mandate
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -298,6 +377,76 @@ export default async function JobDetailPage({
                 Report Closed
               </SubmitButton>
             </form>
+          </div>
+        </div>
+
+        {/* Writing Sample & Capstone Matcher Card */}
+        <div className="mt-6 border border-stone-300 bg-[#FBF9F4] p-4 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-200 pb-2">
+            <span className="font-mono-tabular font-bold text-stone-900 uppercase">
+              Writing Sample &amp; Capstone Matcher
+            </span>
+            <span className="font-mono-tabular text-[10px] text-stone-500">POLICY PORTFOLIO ALIGNMENT</span>
+          </div>
+
+          {!userProfile?.capstoneTopic && !userProfile?.workSampleTitle ? (
+            <div className="mt-2 text-stone-600 leading-relaxed font-mono-tabular">
+              ⚠️ <span className="font-bold text-stone-800">Under construction:</span> You haven&apos;t added a writing sample or capstone topic to your profile yet. Add it in <Link href="/settings" className="font-bold underline text-stone-900">Settings (/settings)</Link> to unlock automated sample-to-JD alignment advice for this mandate.
+            </div>
+          ) : (
+            <div className="mt-2 space-y-1.5 text-stone-800 leading-relaxed">
+              <div>
+                <span className="font-bold text-stone-900">Your Recommended Sample: </span>
+                <span className="font-semibold text-stone-950">{userProfile.workSampleTitle || userProfile.capstoneTopic}</span>
+              </div>
+              <p className="text-[11px] text-stone-600">
+                {gates.quantRequired
+                  ? "Since this mandate tests quantitative methods, emphasize econometric regression, Stata/R scripts, or dataset cleaning from your capstone on page 1 of your brief."
+                  : "Frame this academic paper as a crisp 2-page decision memo with executive takeaways before attaching it."}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Verified Cohort Intelligence & Round-1 Gates Box */}
+        <div className="mt-4 border border-stone-300 bg-white p-4 text-xs">
+          <div className="font-mono-tabular font-bold text-stone-900 uppercase border-b border-stone-200 pb-1.5">
+            Verified Cohort Intelligence &amp; Round-1 Gates
+          </div>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <div>
+              <span className="font-bold text-stone-900">48-Hr Written Assignment / Test: </span>
+              <div className="mt-1 text-stone-700">
+                {verifiedAssignment ? (
+                  <div>
+                    <div className="font-mono-tabular font-bold text-amber-900">
+                      {verifiedAssignment.assignmentTimeLimit || "48 Hours"} ({verifiedAssignment.roleTitle || "Associate / Intern"})
+                    </div>
+                    {verifiedAssignment.assignmentTools && (
+                      <div className="font-mono-tabular text-[11px] text-emerald-900 mt-0.5">
+                        Tools: {verifiedAssignment.assignmentTools}
+                      </div>
+                    )}
+                    <p className="mt-1 text-[11px] leading-relaxed text-stone-600">
+                      {verifiedAssignment.body}
+                    </p>
+                  </div>
+                ) : (
+                  <span className="text-stone-400 italic font-mono-tabular">Under construction — Awaiting cohort submissions</span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <span className="font-bold text-stone-900">Verified Compensation / Stipend: </span>
+              <div className="mt-1 font-mono-tabular text-emerald-950 font-semibold">
+                {verifiedComp ? (
+                  verifiedComp
+                ) : (
+                  <span className="text-stone-400 italic font-mono-tabular font-normal">Under construction — No compensation data logged yet</span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 

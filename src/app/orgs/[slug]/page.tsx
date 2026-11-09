@@ -370,13 +370,60 @@ export default async function OrgDetailPage({
             </div>
           </div>
         ) : (
-          <p className="mt-2 text-xs text-stone-500">
-            Currently <strong>{totalReports}</strong> of <strong>5</strong>{" "}
-            required anonymous outcome reports logged by the cohort. Numbers
-            unlock automatically once 5 members track an application to{" "}
-            {org.name}, preventing individual identification.
+          <p className="mt-2 text-xs text-stone-500 font-mono-tabular">
+            <span className="font-bold text-stone-900">Funnel Stats: </span>
+            <span className="italic">
+              Under construction — Currently <strong>{totalReports}</strong> of <strong>5</strong>{" "}
+              required anonymous outcome reports logged by the cohort. Numbers
+              unlock automatically once 5 members track an application to{" "}
+              {org.name}, preventing individual identification.
+            </span>
           </p>
         )}
+      </div>
+
+      {/* Verified Compensation & Stipend Benchmark Card */}
+      <div className="rounded-2xl border border-stone-200 bg-white p-6">
+        <h2 className="text-base font-bold text-stone-900">
+          Verified Compensation &amp; Stipend Transparency
+        </h2>
+        <p className="text-xs text-stone-500">
+          Real stipend and CTC ranges reported by IIT Delhi MPP batchmates and alumni for {org.name}.
+        </p>
+
+        {(() => {
+          const compNotesList = notes.filter((n) => Boolean(n.note.compensation));
+          if (compNotesList.length === 0) {
+            return (
+              <div className="mt-3 rounded-xl border border-stone-200 bg-stone-50 p-4 font-mono-tabular text-xs text-stone-600">
+                <span className="font-bold text-stone-900">Compensation Transparency: </span>
+                <span className="text-stone-500 italic">
+                  Under construction — No verified compensation data submitted by cohort yet. Share your offer/stipend anonymously below.
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <div className="mt-4 divide-y divide-stone-100 rounded-xl border border-stone-200">
+              {compNotesList.map((n) => (
+                <div key={n.note.id} className="flex flex-wrap items-center justify-between p-3 text-xs">
+                  <div>
+                    <span className="font-bold text-stone-900">
+                      {n.note.roleTitle || "Associate / Intern"}
+                    </span>
+                    <span className="ml-2 font-mono-tabular text-emerald-950 font-bold">
+                      {n.note.compensation}
+                    </span>
+                  </div>
+                  <span className="font-mono-tabular text-[10px] text-stone-400">
+                    Contributed: {n.note.batch || "MPP Cohort"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Shared Cohort Notes (Inheritable across batches) */}

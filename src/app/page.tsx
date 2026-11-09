@@ -11,6 +11,8 @@ import {
   type Sector,
 } from "@/lib/taxonomy";
 
+export const revalidate = 60;
+
 export default async function LandingPage() {
   const user = await getUser();
 
@@ -23,7 +25,15 @@ export default async function LandingPage() {
       db.select({ value: count() }).from(schema.organization),
       db.select({ value: count() }).from(schema.recurringDeadline),
       db
-        .select()
+        .select({
+          id: schema.job.id,
+          orgName: schema.job.orgName,
+          location: schema.job.location,
+          title: schema.job.title,
+          type: schema.job.type,
+          experience: schema.job.experience,
+          sectors: schema.job.sectors,
+        })
         .from(schema.job)
         .where(eq(schema.job.status, "published"))
         .orderBy(desc(schema.job.postedAt))
@@ -233,7 +243,6 @@ export default async function LandingPage() {
             <Link
               key={j.id}
               href={`/jobs/${j.id}`}
-              prefetch={false}
               className="group grid gap-2 px-4 py-3.5 transition hover:bg-[#EFECE4] sm:grid-cols-12 sm:items-center"
             >
               <div className="sm:col-span-3">

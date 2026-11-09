@@ -266,63 +266,13 @@ CREATE TABLE IF NOT EXISTS "resource" (
 `;
 
 async function runBootstrapOnce() {
+  if (process.env.NEXT_PHASE === "phase-production-build") return;
   // Check if already initialized
   try {
     const [{ value }] = await db
       .select({ value: count() })
       .from(schema.organization);
     if (value > 0) {
-      // Ensure fictional demo personas are removed and owner is Shivang Uniyal
-      await db.execute(
-        sql.raw(`
-          DELETE FROM "user" WHERE email IN (
-            'owner@iitd.ac.in',
-            'ananya.mpp25@iitd.ac.in',
-            'rohan.mpp26@iitd.ac.in',
-            'meera.mpp23@iitd.ac.in',
-            'kabir.mpp22@iitd.ac.in'
-          );
-          UPDATE "user" SET name = 'Shivang Uniyal', role = 'owner', batch = 'MPP 2025–27' WHERE email = 'ppm254500@iitd.ac.in';
-        `),
-      );
-
-      // Ensure jobs with deadlines from seed/crawled-jobs.json are synced
-      const [{ withDeadline }] = await db
-        .select({ withDeadline: count() })
-        .from(schema.job)
-        .where(isNotNull(schema.job.deadline));
-      if (withDeadline === 0) {
-        const snapshotPath = join(process.cwd(), "seed/crawled-jobs.json");
-        if (existsSync(snapshotPath)) {
-          const jobsRaw = JSON.parse(
-            readFileSync(snapshotPath, "utf8"),
-          ) as CrawledJobRecord[];
-          for (const j of jobsRaw) {
-            if (!j.deadline) continue;
-            await db
-              .insert(schema.job)
-              .values({
-                orgName: j.orgName,
-                fingerprint: j.fingerprint,
-                title: j.title,
-                url: j.url,
-                location: j.location,
-                locationType: j.locationType,
-                type: j.type,
-                experience: j.experience,
-                sectors: j.sectors,
-                description: j.description || null,
-                deadline: j.deadline,
-                postedAt: j.postedAt ? new Date(j.postedAt) : new Date(),
-                status: "published",
-              })
-              .onConflictDoUpdate({
-                target: schema.job.fingerprint,
-                set: { deadline: j.deadline },
-              });
-          }
-        }
-      }
       return;
     }
   } catch {

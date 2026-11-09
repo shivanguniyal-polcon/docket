@@ -106,6 +106,8 @@ const PRE_APPLY_CHECKLIST = [
   "Did you log the CV version, writing sample attached, and a 7-day follow-up date in your Docket Ledger (/tracker)?",
 ];
 
+export const revalidate = 60;
+
 export default async function ResourcesPage({
   searchParams,
 }: {

@@ -9,7 +9,6 @@ import { getUser, isModerator } from "@/lib/session";
 import { AppNav } from "@/components/nav";
 import { TopProgressBar } from "@/components/top-progress-bar";
 import { db, schema } from "@/db";
-import { ensureDbReady } from "@/db/auto-bootstrap";
 import { count, eq } from "drizzle-orm";
 
 const fontSans = Plus_Jakarta_Sans({
@@ -34,26 +33,25 @@ export const metadata: Metadata = {
     "The single repository for Indian public policy, tech & AI regulation, development consulting, and multilateral mandates — maintained by the IIT Delhi MPP cohort.",
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await ensureDbReady();
   const user = await getUser();
   let pendingCount = 0;
 
   if (user && isModerator((user as { role?: string }).role)) {
-    const [pendingJobs] = await db
-      .select({ value: count() })
-      .from(schema.job)
-      .where(eq(schema.job.status, "pending"));
-    const [openChanges] = await db
-      .select({ value: count() })
-      .from(schema.pageChange)
-      .where(eq(schema.pageChange.status, "open"));
+    const [[pendingJobs], [openChanges]] = await Promise.all([
+      db
+        .select({ value: count() })
+        .from(schema.job)
+        .where(eq(schema.job.status, "pending")),
+      db
+        .select({ value: count() })
+        .from(schema.pageChange)
+        .where(eq(schema.pageChange.status, "open")),
+    ]);
     pendingCount = (pendingJobs?.value ?? 0) + (openChanges?.value ?? 0);
   }
 

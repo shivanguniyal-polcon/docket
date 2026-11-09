@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { getUser } from "@/lib/session";
 import { db, schema } from "@/db";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, count, eq, isNotNull } from "drizzle-orm";
 import {
   ORG_CATEGORIES,
   SECTORS,
@@ -31,6 +31,8 @@ const BG_SHORT: Record<BackgroundId, string> = {
   work_ex: "2–6+ Yrs Work-Ex",
 };
 
+export const revalidate = 60;
+
 export default async function OrgsPage({
   searchParams,
 }: {
@@ -48,25 +50,21 @@ export default async function OrgsPage({
   const bg = (params.bg ?? "").trim() as BackgroundId | "";
   const q = (params.q ?? "").trim().toLowerCase();
 
-  const [orgs, jobs, notes] = await Promise.all([
+  const [orgs, jobCountsRaw, noteCountsRaw] = await Promise.all([
     db.select().from(schema.organization).orderBy(asc(schema.organization.name)),
     db
-      .select({ id: schema.job.id, orgId: schema.job.orgId })
+      .select({ orgId: schema.job.orgId, count: count() })
       .from(schema.job)
-      .where(eq(schema.job.status, "published")),
+      .where(and(eq(schema.job.status, "published"), isNotNull(schema.job.orgId)))
+      .groupBy(schema.job.orgId),
     db
-      .select({ id: schema.orgNote.id, orgId: schema.orgNote.orgId })
-      .from(schema.orgNote),
+      .select({ orgId: schema.orgNote.orgId, count: count() })
+      .from(schema.orgNote)
+      .groupBy(schema.orgNote.orgId),
   ]);
 
-  const jobCounts = new Map<string, number>();
-  for (const j of jobs) {
-    if (j.orgId) jobCounts.set(j.orgId, (jobCounts.get(j.orgId) ?? 0) + 1);
-  }
-  const noteCounts = new Map<string, number>();
-  for (const n of notes) {
-    noteCounts.set(n.orgId, (noteCounts.get(n.orgId) ?? 0) + 1);
-  }
+  const jobCounts = new Map(jobCountsRaw.map((r) => [r.orgId!, Number(r.count)]));
+  const noteCounts = new Map(noteCountsRaw.map((r) => [r.orgId, Number(r.count)]));
 
   const filtered = orgs.filter((o) => {
     const playbook = ORG_HIRING_PLAYBOOK[o.slug];

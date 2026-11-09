@@ -53,6 +53,7 @@ interface SearchParams {
   paid?: string; // "true"
   archetype?: string; // BackgroundId
   academic?: string; // "true"
+  limit?: string;
 }
 
 function getFreshnessBadge(postedAt: Date | string | null) {
@@ -212,6 +213,8 @@ export default async function JobsPage({
   const tenDaysLater = new Date(today.getTime() + 12 * 24 * 60 * 60 * 1000);
   const tenDaysLaterStr = tenDaysLater.toISOString().slice(0, 10);
 
+  const limitParam = Math.min(Math.max(Number(params.limit || 40), 10), 300);
+
   const [
     [{ totalCount }],
     jobs,
@@ -219,20 +222,34 @@ export default async function JobsPage({
     userApps,
     userFits,
     alumniRows,
-    compNotes,
+    noteRows,
     cohortAppCounts,
-    assignmentNotes,
   ] = await Promise.all([
     db
       .select({ totalCount: count() })
       .from(schema.job)
       .where(and(...conditions)),
     db
-      .select()
+      .select({
+        id: schema.job.id,
+        orgId: schema.job.orgId,
+        orgName: schema.job.orgName,
+        title: schema.job.title,
+        url: schema.job.url,
+        location: schema.job.location,
+        locationType: schema.job.locationType,
+        type: schema.job.type,
+        experience: schema.job.experience,
+        sectors: schema.job.sectors,
+        deadline: schema.job.deadline,
+        postedAt: schema.job.postedAt,
+        status: schema.job.status,
+        description: sql<string>`COALESCE(substring(${schema.job.description} from 1 for 2500), '')`.as("description"),
+      })
       .from(schema.job)
       .where(and(...conditions))
       .orderBy(desc(schema.job.postedAt), desc(schema.job.createdAt))
-      .limit(120),
+      .limit(limitParam),
     db
       .select({
         id: schema.job.id,
@@ -272,14 +289,28 @@ export default async function JobsPage({
       })
       .from(schema.profile)
       .innerJoin(schema.user, eq(schema.user.id, schema.profile.userId))
-      .where(eq(schema.profile.alumniOptIn, true)),
+      .where(
+        and(
+          eq(schema.profile.alumniOptIn, true),
+          isNotNull(schema.profile.currentOrg),
+        ),
+      ),
     db
       .select({
         orgId: schema.orgNote.orgId,
         compensation: schema.orgNote.compensation,
+        body: schema.orgNote.body,
+        timeLimit: schema.orgNote.assignmentTimeLimit,
+        roleTitle: schema.orgNote.roleTitle,
       })
       .from(schema.orgNote)
-      .where(isNotNull(schema.orgNote.compensation)),
+      .where(
+        or(
+          isNotNull(schema.orgNote.compensation),
+          eq(schema.orgNote.kind, "assignment"),
+          isNotNull(schema.orgNote.assignmentTimeLimit),
+        ),
+      ),
     db
       .select({
         jobId: schema.application.jobId,
@@ -288,40 +319,30 @@ export default async function JobsPage({
       .from(schema.application)
       .where(isNotNull(schema.application.jobId))
       .groupBy(schema.application.jobId),
-    db
-      .select({
-        orgId: schema.orgNote.orgId,
-        body: schema.orgNote.body,
-        timeLimit: schema.orgNote.assignmentTimeLimit,
-        roleTitle: schema.orgNote.roleTitle,
-      })
-      .from(schema.orgNote)
-      .where(
-        or(
-          eq(schema.orgNote.kind, "assignment"),
-          isNotNull(schema.orgNote.assignmentTimeLimit),
-        ),
-      ),
   ]);
 
   const cohortCountByJobId = new Map(
     cohortAppCounts.map((c) => [c.jobId!, Number(c.count)]),
   );
-  const assignmentByOrgId = new Map(
-    assignmentNotes.map((a) => [a.orgId, a]),
-  );
+  const assignmentByOrgId = new Map<
+    string,
+    { orgId: string; body: string; timeLimit: string | null; roleTitle: string | null }
+  >();
+  const compByOrgId = new Map<string, string>();
+
+  for (const n of noteRows) {
+    if (n.compensation && !compByOrgId.has(n.orgId)) {
+      compByOrgId.set(n.orgId, n.compensation);
+    }
+    if ((n.timeLimit || n.body) && !assignmentByOrgId.has(n.orgId)) {
+      assignmentByOrgId.set(n.orgId, n);
+    }
+  }
 
   const appByJobId = new Map(
     userApps.filter((a) => a.jobId).map((a) => [a.jobId!, a]),
   );
   const fitByJobId = new Map(userFits.map((f) => [f.jobId, f]));
-
-  const compByOrgId = new Map<string, string>();
-  for (const c of compNotes) {
-    if (c.compensation && !compByOrgId.has(c.orgId)) {
-      compByOrgId.set(c.orgId, c.compensation);
-    }
-  }
 
   function countAlumniForOrg(orgName: string): number {
     const norm = orgName.toLowerCase();
@@ -750,7 +771,6 @@ export default async function JobsPage({
                       <div>
                         <Link
                           href={`/jobs/${j.id}`}
-                          prefetch={false}
                           className="inline-flex items-center gap-1 border border-stone-900 bg-[#EFECE4] px-1.5 py-0.5 font-mono-tabular text-[10px] font-semibold text-stone-900 hover:bg-stone-900 hover:text-[#F6F3EC]"
                         >
                           <Users className="h-3 w-3" />
@@ -788,7 +808,6 @@ export default async function JobsPage({
                     })()}
                     <Link
                       href={`/jobs/${j.id}`}
-                      prefetch={false}
                       className="font-serif-editorial block text-lg leading-snug font-normal text-stone-950 hover:underline"
                     >
                       {j.title}
@@ -962,6 +981,35 @@ export default async function JobsPage({
               </div>
             );
           })}
+
+          {totalCount > jobs.length && (
+            <div className="flex flex-col items-center justify-between gap-3 bg-[#EFECE4] p-5 sm:flex-row">
+              <div className="font-mono-tabular text-xs text-stone-700">
+                Showing <strong className="text-stone-950">{jobs.length}</strong> of{" "}
+                <strong className="text-stone-950">{totalCount}</strong> active mandates
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/jobs?${new URLSearchParams({
+                    ...(params as Record<string, string>),
+                    limit: String(jobs.length + 40),
+                  }).toString()}`}
+                  className="border border-stone-900 bg-stone-900 px-4 py-2 font-mono-tabular text-xs font-bold text-[#F6F3EC] uppercase hover:bg-stone-800"
+                >
+                  Load Next 40 Mandates ({totalCount - jobs.length} remaining) ↓
+                </Link>
+                <Link
+                  href={`/jobs?${new URLSearchParams({
+                    ...(params as Record<string, string>),
+                    limit: String(totalCount),
+                  }).toString()}`}
+                  className="border border-stone-400 bg-white px-3 py-2 font-mono-tabular text-xs font-semibold text-stone-700 uppercase hover:border-stone-900"
+                >
+                  View All ({totalCount})
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       )}
       </ComparatorProvider>
